@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yasser-Store</title>
-    <!-- استدعاء Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; }
@@ -14,15 +13,21 @@
             border: 1px solid #4d0099; 
             border-radius: 15px;
             transition: transform 0.3s;
+            overflow: hidden;
         }
-        .card:hover { transform: scale(1.05); }
-        .card-img-top { height: 150px; object-fit: cover; border-radius: 15px 15px 0 0; }
+        .card:hover { transform: scale(1.03); }
+        /* تعديل الصور لتظهر كاملة وبدون قص */
+        .card-img-top { 
+            width: 100%; 
+            height: 180px; /* يمكنك تعديل الارتفاع حسب ما يناسب صورك */
+            object-fit: contain; 
+            background-color: #1a0033;
+        }
         .btn-login { background-color: #8000ff; color: white; border: none; }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر -->
     <nav class="navbar navbar-dark p-3">
         <div class="container">
             <span class="navbar-brand fw-bold">Yasser-Store</span>
@@ -30,87 +35,44 @@
         </div>
     </nav>
 
-    <!-- الأقسام -->
     <div class="container mt-4">
-        <div class="row g-3"> <!-- g-3 تعطي مسافات بين الكروت -->
-            
-            <!-- كرت قسم الألعاب -->
-            <div class="col-6">
-                <a href="games.html" class="text-decoration-none">
-                    <div class="card text-white">
-                        <img src="games.jpg" class="card-img-top" alt="ألعاب">
-                        <div class="card-body text-center p-2"><h6>الألعاب</h6></div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- كرت قسم التطبيقات -->
-            <div class="col-6">
-                <a href="apps.html" class="text-decoration-none">
-                    <div class="card text-white">
-                        <img src="apps.jpg" class="card-img-top" alt="تطبيقات">
-                        <div class="card-body text-center p-2"><h6>التطبيقات</h6></div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- كرت قسم السوشيال -->
-            <div class="col-6">
-                <a href="social.html" class="text-decoration-none">
-                    <div class="card text-white">
-                        <img src="social.jpg" class="card-img-top" alt="سوشيال">
-                        <div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- كرت قسم البطاقات -->
-            <div class="col-6">
-                <a href="cards.html" class="text-decoration-none">
-                    <div class="card text-white">
-                        <img src="cards.jpg" class="card-img-top" alt="بطاقات">
-                        <div class="card-body text-center p-2"><h6>بطاقات إلكترونية</h6></div>
-                    </div>
-                </a>
-            </div>
-
+        <div class="row g-3">
+            <div class="col-6"><div class="card"><img src="games.jpg" class="card-img-top" alt="ألعاب"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="apps.jpg" class="card-img-top" alt="تطبيقات"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="social.jpg" class="card-img-top" alt="سوشيال"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="cards.jpg" class="card-img-top" alt="بطاقات"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></div>
         </div>
     </div>
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
-    authDomain: "yasser-store-7e736.firebaseapp.com",
-    projectId: "yasser-store-7e736",
-    storageBucket: "yasser-store-7e736.firebasestorage.app",
-    messagingSenderId: "363907199851",
-    appId: "1:363907199851:web:f36f479fa91b53823c922e"
-  };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const provider = new GoogleAuthProvider();
+        const firebaseConfig = {
+          apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
+          authDomain: "yasser-store-7e736.firebaseapp.com",
+          projectId: "yasser-store-7e736",
+          storageBucket: "yasser-store-7e736.firebasestorage.app",
+          messagingSenderId: "363907199851",
+          appId: "1:363907199851:web:f36f479fa91b53823c922e"
+        };
 
-  // الزر الموجود في الـ Navbar
-  const loginBtn = document.getElementById('loginBtn');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        const loginBtn = document.getElementById('loginBtn');
 
-  // عند الضغط على زر تسجيل الدخول
-  loginBtn.addEventListener('click', () => {
-    signInWithPopup(auth, provider).catch((error) => console.error(error));
-  });
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+            .then(() => { alert("تم تسجيل الدخول بنجاح!"); })
+            .catch((error) => { alert("خطأ: " + error.message); });
+        });
 
-  // مراقبة حالة المستخدم (إذا سجل دخول، نحول الزر لأيقونة بروفايل)
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // المستخدم سجل دخوله، استبدل الزر بأيقونة
-      loginBtn.innerHTML = `<img src="${user.photoURL}" style="width:30px; height:30px; border-radius:50%; border:2px solid #8000ff;">`;
-      loginBtn.onclick = () => window.location.href = 'profile.html'; // رابط لصفحة البروفايل سنبنيها لاحقاً
-    }
-  });
-</script>
-
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginBtn.innerHTML = `<img src="${user.photoURL}" style="width:30px; height:30px; border-radius:50%;">`;
+            }
+        });
+    </script>
 </body>
 </html>
