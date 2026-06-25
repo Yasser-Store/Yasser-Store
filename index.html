@@ -76,6 +76,41 @@
 
         </div>
     </div>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
+    authDomain: "yasser-store-7e736.firebaseapp.com",
+    projectId: "yasser-store-7e736",
+    storageBucket: "yasser-store-7e736.firebasestorage.app",
+    messagingSenderId: "363907199851",
+    appId: "1:363907199851:web:f36f479fa91b53823c922e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+
+  // الزر الموجود في الـ Navbar
+  const loginBtn = document.getElementById('loginBtn');
+
+  // عند الضغط على زر تسجيل الدخول
+  loginBtn.addEventListener('click', () => {
+    signInWithPopup(auth, provider).catch((error) => console.error(error));
+  });
+
+  // مراقبة حالة المستخدم (إذا سجل دخول، نحول الزر لأيقونة بروفايل)
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // المستخدم سجل دخوله، استبدل الزر بأيقونة
+      loginBtn.innerHTML = `<img src="${user.photoURL}" style="width:30px; height:30px; border-radius:50%; border:2px solid #8000ff;">`;
+      loginBtn.onclick = () => window.location.href = 'profile.html'; // رابط لصفحة البروفايل سنبنيها لاحقاً
+    }
+  });
+</script>
 
 </body>
 </html>
