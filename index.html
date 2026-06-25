@@ -81,11 +81,18 @@
             .catch((error) => { alert("خطأ: " + error.message); });
         });
 
-        onAuthStateChanged(auth, (user) => {
+                onAuthStateChanged(auth, (user) => {
             if (user) {
+                // إضافة الصورة
                 loginBtn.innerHTML = `<img src="${user.photoURL}" style="width:30px; height:30px; border-radius:50%;">`;
+                
+                // التعديل الجديد: إضافة أمر الانتقال عند الضغط على الصورة
+                loginBtn.onclick = () => {
+                    window.location.href = 'profile.html';
+                };
             }
         });
+
     </script>
 </body>
 </html>
