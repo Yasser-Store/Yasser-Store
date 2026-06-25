@@ -73,7 +73,7 @@
         await setDoc(doc(db, "users", user.uid), { fullName, phone }, { merge: true });
 
         // 2. إرسال إلى بوت التيلجرام عبر السكربت الخاص بك
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziN6AlKQfU36tWli-XzS_l6bOf4qPdSPjnakJrrFypmFbkNBLrJVU2t5c04G6UFkQLaQ/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjd078aW48syj19BIaPXSNmenExVLZm-EJ-j10kl0fwXwMQtU8JVK-JidsNSCGAQzjQA/exec";
         
         fetch(SCRIPT_URL, {
             method: "POST",
