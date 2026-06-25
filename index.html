@@ -6,25 +6,38 @@
     <title>Yasser-Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; }
-        .navbar { background-color: #1a0033 !important; }
-        .card { 
-            background-color: #26004d; 
-            border: 1px solid #4d0099; 
-            border-radius: 15px;
-            transition: transform 0.3s;
-            overflow: hidden;
-        }
-        .card:hover { transform: scale(1.03); }
-        /* تعديل الصور لتظهر كاملة وبدون قص */
-        .card-img-top { 
-            width: 100%; 
-            height: 180px; /* يمكنك تعديل الارتفاع حسب ما يناسب صورك */
-            object-fit: contain; 
-            background-color: #1a0033;
-        }
-        .btn-login { background-color: #8000ff; color: white; border: none; }
-    </style>
+    body { background-color: #000; color: #fff; font-family: sans-serif; }
+    .navbar { background-color: #1a0033 !important; }
+    
+    .card { 
+        background-color: #26004d; 
+        border: 2px solid #4d0099; 
+        border-radius: 15px;
+        transition: transform 0.3s;
+        overflow: visible; 
+        margin-bottom: 20px;
+    }
+    
+    .card-img-top { 
+        width: 100%; 
+        height: auto; 
+        display: block;
+        border-radius: 13px 13px 0 0;
+    }
+    
+    /* التعديل الجديد لضمان اللون الأبيض */
+    .card-body { 
+        color: #ffffff !important; 
+    }
+    
+    .card-body h6 { 
+        color: #ffffff !important; 
+        font-weight: bold;
+    }
+    
+    .btn-login { background-color: #8000ff; color: white; border: none; }
+</style>
+
 </head>
 <body>
 
@@ -37,10 +50,10 @@
 
     <div class="container mt-4">
         <div class="row g-3">
-            <div class="col-12"><div class="card"><img src="games.jpg" class="card-img-top" alt="ألعاب"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></div>
-            <div class="col-12"><div class="card"><img src="apps.jpg" class="card-img-top" alt="تطبيقات"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></div>
-            <div class="col-12"><div class="card"><img src="social.jpg" class="card-img-top" alt="سوشيال"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></div>
-            <div class="col-12"><div class="card"><img src="cards.jpg" class="card-img-top" alt="بطاقات"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="games.jpg" class="card-img-top" alt="ألعاب"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="apps.jpg" class="card-img-top" alt="تطبيقات"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="social.jpg" class="card-img-top" alt="سوشيال"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="cards.jpg" class="card-img-top" alt="بطاقات"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></div>
         </div>
     </div>
 
