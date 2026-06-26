@@ -6,54 +6,42 @@
     <title>Yasser-Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body { background-color: #000; color: #fff; font-family: sans-serif; }
-    .navbar { background-color: #1a0033 !important; }
-    
-    .card { 
-        background-color: #26004d; 
-        border: 2px solid #4d0099; 
-        border-radius: 15px;
-        transition: transform 0.3s;
-        overflow: visible; 
-        margin-bottom: 20px;
-    }
-    
-    .card-img-top { 
-        width: 100%; 
-        height: auto; 
-        display: block;
-        border-radius: 13px 13px 0 0;
-    }
-    
-    /* التعديل الجديد لضمان اللون الأبيض */
-    .card-body { 
-        color: #ffffff !important; 
-    }
-    
-    .card-body h6 { 
-        color: #ffffff !important; 
-        font-weight: bold;
-    }
-    
-    .btn-login { background-color: #8000ff; color: white; border: none; }
-</style>
-
+        body { background-color: #000; color: #fff; font-family: sans-serif; }
+        .navbar { background-color: #1a0033 !important; }
+        .card { 
+            background-color: #26004d; 
+            border: 2px solid #4d0099; 
+            border-radius: 15px;
+            transition: transform 0.3s;
+            overflow: visible; 
+            margin-bottom: 20px;
+        }
+        .card-img-top { width: 100%; height: auto; display: block; border-radius: 13px 13px 0 0; }
+        .card-body { color: #ffffff !important; }
+        .card-body h6 { color: #ffffff !important; font-weight: bold; }
+        .btn-custom { background-color: #8000ff; color: white; border: none; margin-right: 5px; }
+    </style>
 </head>
 <body>
 
     <nav class="navbar navbar-dark p-3">
         <div class="container">
             <span class="navbar-brand fw-bold">Yasser-Store</span>
-            <button class="btn btn-login btn-sm" id="loginBtn">تسجيل الدخول</button>
+            <div>
+                <!-- زر تسجيل الدخول -->
+                <button class="btn btn-custom btn-sm" id="loginBtn">تسجيل الدخول</button>
+                <!-- زر البروفايل (مخفي افتراضياً) -->
+                <button class="btn btn-custom btn-sm d-none" id="profileBtn">البروفايل</button>
+            </div>
         </div>
     </nav>
 
     <div class="container mt-4">
         <div class="row g-3">
-            <div class="col-6"><div class="card"><img src="games.jpg" class="card-img-top" alt="ألعاب"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></div>
-            <div class="col-6"><div class="card"><img src="apps.jpg" class="card-img-top" alt="تطبيقات"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></div>
-            <div class="col-6"><div class="card"><img src="social.jpg" class="card-img-top" alt="سوشيال"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></div>
-            <div class="col-6"><div class="card"><img src="cards.jpg" class="card-img-top" alt="بطاقات"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="games.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="apps.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="social.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></div>
+            <div class="col-6"><div class="card"><img src="cards.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></div>
         </div>
     </div>
 
@@ -73,26 +61,28 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth();
         const provider = new GoogleAuthProvider();
+        
         const loginBtn = document.getElementById('loginBtn');
+        const profileBtn = document.getElementById('profileBtn');
 
+        // تسجيل الدخول
         loginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider)
-            .then(() => { alert("تم تسجيل الدخول بنجاح!"); })
-            .catch((error) => { alert("خطأ: " + error.message); });
+            signInWithPopup(auth, provider).catch((error) => { alert("خطأ: " + error.message); });
         });
 
-                onAuthStateChanged(auth, (user) => {
+        // مراقبة حالة الدخول
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // إضافة الصورة
-                loginBtn.innerHTML = `<img src="${user.photoURL}" style="width:30px; height:30px; border-radius:50%;">`;
-                
-                // التعديل الجديد: إضافة أمر الانتقال عند الضغط على الصورة
-                loginBtn.onclick = () => {
-                    window.location.href = 'profile.html';
-                };
+                // المستخدم مسجل دخول: إظهار البروفايل وإخفاء تسجيل الدخول
+                loginBtn.classList.add('d-none');
+                profileBtn.classList.remove('d-none');
+                profileBtn.onclick = () => { window.location.href = 'profile.html'; };
+            } else {
+                // المستخدم غير مسجل: إظهار تسجيل الدخول وإخفاء البروفايل
+                loginBtn.classList.remove('d-none');
+                profileBtn.classList.add('d-none');
             }
         });
-
     </script>
 </body>
 </html>
