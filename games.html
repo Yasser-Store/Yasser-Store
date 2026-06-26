@@ -35,25 +35,35 @@
     const db = getFirestore(initializeApp(firebaseConfig));
 
     async function loadGames() {
-        const container = document.getElementById('gamesContainer');
-        // جلب المنتجات التي تصنيفها 'games' فقط
+    const container = document.getElementById('gamesContainer');
+    
+    try {
         const q = query(collection(db, "products"), where("category", "==", "games"));
         const querySnapshot = await getDocs(q);
-
-        container.innerHTML = ""; // إفراغ كلمة "جاري الجلب"
         
-        querySnapshot.forEach((doc) => {
-            const product = doc.data();
-            container.innerHTML += `
-                <div class="col-4">
-                    <div class="card">
-                        <img src="${product.image}" class="card-img-top">
-                        <div class="card-body"><h6>${product.name}</h6></div>
+        // --- هذا التعديل سيظهر لك الحقيقة على الشاشة مباشرة ---
+        if (querySnapshot.empty) {
+            container.innerHTML = "<h4>لم أجد أي منتج تصنيفه 'games' في قاعدة البيانات. تأكد من تطابق الحروف!</h4>";
+        } else {
+            container.innerHTML = "";
+            querySnapshot.forEach((doc) => {
+                const product = doc.data();
+                container.innerHTML += `
+                    <div class="col-4">
+                        <div class="card">
+                            <img src="${product.image}" class="card-img-top">
+                            <div class="card-body"><h6>${product.name}</h6></div>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
+        // ----------------------------------------------------
+    } catch (error) {
+        container.innerHTML = "<h4>خطأ: " + error.message + "</h4>";
     }
+}
+
 
     loadGames();
 </script>
