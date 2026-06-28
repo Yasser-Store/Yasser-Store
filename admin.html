@@ -172,6 +172,16 @@
             border-radius: 12px !important;
             padding: 6px 12px !important;
         }
+        .btn-back {
+            background: #8000ff;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .btn-back:hover {
+            background: #6a00cc;
+        }
     </style>
 </head>
 <body>
@@ -180,7 +190,7 @@
     <nav class="navbar navbar-custom">
         <div class="container d-flex justify-content-between align-items-center">
             <span class="navbar-brand fw-bold"><i class="bi bi-speedometer2"></i> لوحة التحكم</span>
-            <button class="btn btn-back" onclick="window.location.href='index.html'" style="background:#8000ff; color:#fff; border:none; padding:5px 15px; border-radius:30px;">
+            <button class="btn btn-back" onclick="window.location.href='index.html'">
                 <i class="bi bi-house"></i> المتجر
             </button>
         </div>
@@ -315,7 +325,7 @@
         const db = getFirestore(app);
         const auth = getAuth();
 
-        let editingProductId = null; // لتخزين معرف المنتج الجاري تعديله
+        let editingProductId = null;
 
         // دوال التبويبات
         window.switchTab = (tab) => {
@@ -328,18 +338,23 @@
             else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
             else if (tab === 'categories') document.getElementById('tabCategories').classList.add('active');
 
-            // تحديث البيانات عند التبديل
             renderData();
         };
 
-        // جلب الفئات وتحديث القائمة المنسدلة وجدول الأقسام
+        // جلب الفئات
         async function loadCategories() {
-            const snap = await getDocs(collection(db, "categories"));
-            const cats = [];
-            snap.forEach(d => cats.push({ id: d.id, ...d.data() }));
-            return cats;
+            try {
+                const snap = await getDocs(collection(db, "categories"));
+                const cats = [];
+                snap.forEach(d => cats.push({ id: d.id, ...d.data() }));
+                return cats;
+            } catch (e) {
+                console.error("خطأ في تحميل الأقسام:", e);
+                return [];
+            }
         }
 
+        // تعبئة القائمة المنسدلة
         async function populateCategorySelect() {
             const select = document.getElementById('pCat');
             const cats = await loadCategories();
@@ -354,87 +369,114 @@
                     select.appendChild(opt);
                 });
             }
-            // إذا كان هناك منتج قيد التعديل، حدد الفئة الخاصة به
-            if (editingProductId) {
-                // سيتم ضبطه لاحقاً عند ملء النموذج
-            }
         }
 
         // عرض المنتجات
         async function renderProducts() {
             const tbody = document.getElementById('pTable');
             tbody.innerHTML = '';
-            const snap = await getDocs(collection(db, "products"));
-            const catsMap = {};
-            (await loadCategories()).forEach(c => catsMap[c.id] = c.name);
+            try {
+                const snap = await getDocs(collection(db, "products"));
+                const catsMap = {};
+                (await loadCategories()).forEach(c => catsMap[c.id] = c.name);
 
-            snap.forEach(doc => {
-                const p = doc.data();
-                const catName = catsMap[p.category] || 'بدون قسم';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${p.name}</td>
-                        <td>${catName}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2" onclick="editProduct('${doc.id}')"><i class="bi bi-pencil-square"></i> تعديل</button>
-                            <button class="btn btn-sm btn-danger" onclick="delP('${doc.id}')"><i class="bi bi-trash"></i> حذف</button>
-                        </td>
-                    </tr>
-                `;
-            });
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    const catName = catsMap[p.category] || 'بدون قسم';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${p.name}</td>
+                            <td>${catName}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning me-2" onclick="editProduct('${doc.id}')"><i class="bi bi-pencil-square"></i> تعديل</button>
+                                <button class="btn btn-sm btn-danger" onclick="delP('${doc.id}')"><i class="bi bi-trash"></i> حذف</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">فشل تحميل المنتجات</td></tr>';
+                console.error(e);
+            }
         }
 
-        // عرض الطلبات
+        // عرض الطلبات (مع دعم البيانات القديمة والجديدة)
         async function renderOrders() {
             const tbody = document.getElementById('oTable');
             tbody.innerHTML = '';
-            const snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
-            snap.forEach(doc => {
-                const o = doc.data();
-                const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير معروف';
-                const status = o.status || 'pending';
-                const statusBadge = {
-                    'pending': 'badge-pending',
-                    'completed': 'badge-completed',
-                    'cancelled': 'badge-cancelled'
-                }[status] || 'badge-pending';
-                const statusText = {
-                    'pending': 'قيد المعالجة',
-                    'completed': 'مكتمل',
-                    'cancelled': 'ملغي'
-                }[status] || 'قيد المعالجة';
+            try {
+                // محاولة الترتيب حسب createdAt أولاً، وإلا استخدم timestamp
+                let snap;
+                try {
+                    snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
+                } catch {
+                    snap = await getDocs(query(collection(db, "orders"), orderBy("timestamp", "desc")));
+                }
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${o.productName || 'غير معروف'}</td>
-                        <td>${o.customerName || o.userData || ''}</td>
-                        <td>${o.customerEmail || ''}</td>
-                        <td>${o.customerPhone || ''}</td>
-                        <td>${o.orderDetails || ''}</td>
-                        <td>${date}</td>
-                        <td>
-                            <select class="form-select form-select-sm status-select" data-orderid="${doc.id}" style="min-width:140px;">
-                                <option value="pending" ${status==='pending'?'selected':''}>قيد المعالجة</option>
-                                <option value="completed" ${status==='completed'?'selected':''}>مكتمل</option>
-                                <option value="cancelled" ${status==='cancelled'?'selected':''}>ملغي</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="delO('${doc.id}')"><i class="bi bi-x-lg"></i> مسح</button>
-                        </td>
-                    </tr>
-                `;
-            });
+                if (snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">لا توجد طلبات حالياً</td></tr>';
+                    return;
+                }
 
-            // إضافة حدث تغيير الحالة
-            document.querySelectorAll('.status-select').forEach(sel => {
-                sel.addEventListener('change', async (e) => {
-                    const id = sel.dataset.orderid;
-                    const newStatus = sel.value;
-                    await updateDoc(doc(db, "orders", id), { status: newStatus });
-                    renderOrders();
+                snap.forEach(doc => {
+                    const o = doc.data();
+                    // استخراج التاريخ من createdAt أو timestamp
+                    let date = 'غير معروف';
+                    if (o.createdAt) {
+                        date = new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG');
+                    } else if (o.timestamp) {
+                        date = o.timestamp;
+                    }
+
+                    const status = o.status || 'pending';
+                    const statusText = {
+                        'pending': 'قيد المعالجة',
+                        'completed': 'مكتمل',
+                        'cancelled': 'ملغي'
+                    }[status] || 'قيد المعالجة';
+
+                    // استخراج بيانات العميل (من userData أو حقول منفصلة)
+                    const customerName = o.customerName || o.userData || 'غير معروف';
+                    const customerEmail = o.customerEmail || '';
+                    const customerPhone = o.customerPhone || '';
+                    const orderDetails = o.orderDetails || o.userData || '';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${o.productName || 'غير معروف'}</td>
+                            <td>${customerName}</td>
+                            <td>${customerEmail}</td>
+                            <td>${customerPhone}</td>
+                            <td>${orderDetails}</td>
+                            <td>${date}</td>
+                            <td>
+                                <select class="form-select form-select-sm status-select" data-orderid="${doc.id}" style="min-width:140px;">
+                                    <option value="pending" ${status==='pending'?'selected':''}>قيد المعالجة</option>
+                                    <option value="completed" ${status==='completed'?'selected':''}>مكتمل</option>
+                                    <option value="cancelled" ${status==='cancelled'?'selected':''}>ملغي</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="delO('${doc.id}')"><i class="bi bi-x-lg"></i> مسح</button>
+                            </td>
+                        </tr>
+                    `;
                 });
-            });
+
+                // أحداث تغيير الحالة
+                document.querySelectorAll('.status-select').forEach(sel => {
+                    sel.addEventListener('change', async (e) => {
+                        const id = sel.dataset.orderid;
+                        const newStatus = sel.value;
+                        await updateDoc(doc(db, "orders", id), { status: newStatus });
+                        renderOrders();
+                    });
+                });
+
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">فشل تحميل الطلبات</td></tr>';
+                console.error(e);
+            }
         }
 
         // عرض الأقسام
@@ -442,6 +484,10 @@
             const tbody = document.getElementById('cTable');
             tbody.innerHTML = '';
             const cats = await loadCategories();
+            if (cats.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">لا توجد أقسام</td></tr>';
+                return;
+            }
             cats.forEach((c, idx) => {
                 tbody.innerHTML += `
                     <tr>
@@ -457,7 +503,6 @@
                 `;
             });
 
-            // أحداث تحديث الأقسام
             document.querySelectorAll('.update-cat-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = btn.dataset.catid;
@@ -501,13 +546,11 @@
 
             document.getElementById('pName').value = product.name || '';
             document.getElementById('pPrompt').value = product.inputPrompt || '';
-            // تحديد الفئة في القائمة المنسدلة
             const select = document.getElementById('pCat');
             if (product.category) {
                 select.value = product.category;
             }
 
-            // ملء الباقات
             const container = document.getElementById('packagesContainer');
             container.innerHTML = '';
             if (product.packages && Array.isArray(product.packages)) {
@@ -523,10 +566,7 @@
                 });
             }
 
-            // تغيير صورة المنتج - نتركها فارغة
             document.getElementById('pImage').value = '';
-
-            // التمرير إلى الأعلى
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
@@ -567,7 +607,6 @@
             if (!name) return alert('الرجاء إدخال اسم المنتج');
             if (!category) return alert('الرجاء اختيار قسم');
 
-            // جمع الباقات
             const packages = [];
             document.querySelectorAll('.package-row').forEach(row => {
                 const pkgName = row.querySelector('.pkg-name').value.trim();
@@ -581,37 +620,34 @@
             if (file) {
                 const formData = new FormData();
                 formData.append('image', file);
-                const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
-                    method: 'POST',
-                    body: formData
-                });
-                const imgData = await res.json();
-                if (imgData.success) {
-                    imageUrl = imgData.data.url;
-                } else {
-                    alert('فشل رفع الصورة، حاول مرة أخرى');
+                try {
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const imgData = await res.json();
+                    if (imgData.success) {
+                        imageUrl = imgData.data.url;
+                    } else {
+                        alert('فشل رفع الصورة، حاول مرة أخرى');
+                        return;
+                    }
+                } catch (e) {
+                    alert('خطأ في رفع الصورة: ' + e.message);
                     return;
                 }
             }
 
-            const productData = {
-                name,
-                inputPrompt: prompt,
-                category,
-                packages,
-            };
-
-            if (imageUrl) {
-                productData.image = imageUrl;
-            }
+            const productData = { name, inputPrompt: prompt, category, packages };
+            if (imageUrl) productData.image = imageUrl;
 
             try {
                 if (editingProductId) {
-                    // تحديث
                     await updateDoc(doc(db, "products", editingProductId), productData);
                     alert('تم تحديث المنتج بنجاح!');
                 } else {
-                    // إضافة جديدة
+                    // إذا كانت إضافة جديدة والصورة فارغة -> منع الحفظ
+                    if (!imageUrl) return alert('يجب اختيار صورة للمنتج الجديد!');
                     await setDoc(doc(db, "products", Date.now().toString()), productData);
                     alert('تم إضافة المنتج بنجاح!');
                 }
@@ -627,9 +663,7 @@
             document.getElementById('pPrompt').value = '';
             document.getElementById('pImage').value = '';
             document.getElementById('packagesContainer').innerHTML = '';
-            // إضافة باقة افتراضية
             document.getElementById('addPackageBtn').click();
-
             renderData();
         });
 
@@ -645,7 +679,6 @@
             if (user && user.email === "yasserramadanhoms@gmail.com") {
                 document.getElementById('authStatus').classList.add('d-none');
                 document.getElementById('adminPanel').classList.remove('d-none');
-                // إضافة باقة افتراضية عند التحميل
                 document.getElementById('addPackageBtn').click();
                 renderData();
             } else {
