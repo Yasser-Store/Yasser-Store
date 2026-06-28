@@ -34,7 +34,6 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -64,6 +63,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
@@ -73,7 +73,10 @@
       messagingSenderId: "363907199851",
       appId: "1:363907199851:web:f36f479fa91b53823c922e"
     };
-    const db = getFirestore(initializeApp(firebaseConfig));
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
     const scriptURL = "https://script.google.com/macros/s/AKfycbzzK_n4kr0sNmtMG5kQ4gVsT4a0vldroJGWXK5xTCbjQB4TnnWBPIdGH6zyEDD4A9hOTg/exec";
 
     window.allProducts = {};
@@ -128,6 +131,12 @@
         document.getElementById('orderForm').classList.remove('d-none');
 
         document.getElementById('confirmBtn').onclick = async () => {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("يجب تسجيل الدخول أولاً قبل إتمام الطلب!");
+                return;
+            }
+
             const userData = document.getElementById('userInput').value;
             if (!userData) return alert("الرجاء إدخال البيانات!");
             
@@ -138,6 +147,7 @@
             try {
                 // 1. الحفظ في فايربيس
                 await setDoc(doc(db, "orders", Date.now().toString()), {
+                    userId: user.uid,
                     productName: product.name, packageName: pkg.name, price: pkg.price,
                     userData: userData, timestamp: new Date().toLocaleString(), status: "جديد"
                 });
