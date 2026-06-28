@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم ياسر تيك - إدارة المنتجات</title>
+    <title>لوحة تحكم ياسر تيك - الإدارة الشاملة</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -116,6 +116,23 @@
             vertical-align: middle;
             border: none;
         }
+        .nav-pills .nav-link {
+            color: #aaa;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin: 0 5px;
+            transition: 0.3s;
+        }
+        .nav-pills .nav-link.active {
+            color: #fff;
+            background: #7c4dff;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.5);
+        }
+        .nav-pills .nav-link:hover:not(.active) {
+            color: #fff;
+            background: #2a0055;
+        }
         #authStatus {
             padding: 30px;
             text-align: center;
@@ -124,6 +141,15 @@
             border-radius: 30px;
             margin-top: 50px;
         }
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .badge-pending { background: #ff9800; color: #000; }
+        .badge-completed { background: #4caf50; color: #fff; }
+        .badge-cancelled { background: #f44336; color: #fff; }
         .section-title {
             display: flex;
             align-items: center;
@@ -155,6 +181,14 @@
             font-size: 0.8rem;
             color: #fff;
         }
+        .status-select {
+            min-width: 140px;
+            background-color: #1f0040 !important;
+            color: #fff !important;
+            border: 1px solid #7b1fa2 !important;
+            border-radius: 12px !important;
+            padding: 6px 12px !important;
+        }
     </style>
 </head>
 <body>
@@ -173,7 +207,15 @@
 
         <div id="adminPanel" class="d-none">
 
-            <!-- قسم إضافة/تعديل المنتجات -->
+            <!-- التبويبات -->
+            <ul class="nav nav-pills mb-4 justify-content-center">
+                <li class="nav-item"><a class="nav-link active" id="tabAdd" onclick="switchTab('add')"><i class="bi bi-plus-circle"></i> إضافة منتج</a></li>
+                <li class="nav-item"><a class="nav-link" id="tabOrders" onclick="switchTab('orders')"><i class="bi bi-list-ul"></i> الطلبات</a></li>
+            </ul>
+
+            <!-- =============================== -->
+            <!-- قسم إضافة/تعديل المنتجات (كما هو) -->
+            <!-- =============================== -->
             <div id="addSection">
                 <div class="card">
                     <div class="section-title">
@@ -223,13 +265,45 @@
                 </div>
             </div>
 
+            <!-- =============================== -->
+            <!-- قسم الطلبات (الجديد)             -->
+            <!-- =============================== -->
+            <div id="ordersSection" class="d-none">
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-cart-check"></i>
+                        <h3>جميع طلبات الزبائن</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>المنتج</th>
+                                    <th>اسم المستخدم</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>رقم الهاتف</th>
+                                    <th>التفاصيل</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>تحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <tr><td colspan="9" class="text-center text-muted">جاري تحميل الطلبات...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
@@ -246,7 +320,7 @@
 
         let editingProductId = null;
 
-        // أسماء الأقسام لعرضها في الجدول
+        // أسماء الأقسام
         const categoryNames = {
             'games': '🎮 ألعاب',
             'apps': '📱 تطبيقات',
@@ -254,7 +328,19 @@
             'cards': '💳 بطاقات'
         };
 
-        // عرض المنتجات
+        // ---------- التبويبات ----------
+        window.switchTab = (tab) => {
+            document.getElementById('addSection').classList.toggle('d-none', tab !== 'add');
+            document.getElementById('ordersSection').classList.toggle('d-none', tab !== 'orders');
+
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            if (tab === 'add') document.getElementById('tabAdd').classList.add('active');
+            else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
+
+            if (tab === 'orders') renderOrders();
+        };
+
+        // ---------- عرض المنتجات ----------
         async function renderProducts() {
             const tbody = document.getElementById('pTable');
             tbody.innerHTML = '';
@@ -280,7 +366,90 @@
             }
         }
 
-        // --- دوال المنتجات ---
+        // ---------- عرض الطلبات مع بيانات المستخدم ----------
+        async function renderOrders() {
+            const tbody = document.getElementById('ordersTable');
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-secondary">جاري التحميل...</td></tr>';
+
+            try {
+                // 1. جلب جميع الطلبات
+                const ordersSnap = await getDocs(collection(db, "orders"));
+                if (ordersSnap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">لا توجد طلبات حتى الآن</td></tr>';
+                    return;
+                }
+
+                // 2. جلب جميع المستخدمين (مرة واحدة) لتقليل عدد الطلبات
+                const usersSnap = await getDocs(collection(db, "users"));
+                const usersMap = {};
+                usersSnap.forEach(doc => {
+                    usersMap[doc.id] = doc.data();
+                });
+
+                let rowIndex = 1;
+                tbody.innerHTML = '';
+
+                // 3. عرض كل طلب مع بيانات المستخدم
+                for (const doc of ordersSnap.docs) {
+                    const order = doc.data();
+                    const userId = order.userId || order.userID || '';
+                    const userData = usersMap[userId] || {};
+
+                    // استخراج التاريخ
+                    let date = 'غير معروف';
+                    if (order.createdAt) {
+                        date = new Date(order.createdAt.seconds * 1000).toLocaleString('ar-EG');
+                    } else if (order.timestamp) {
+                        date = order.timestamp;
+                    }
+
+                    const status = order.status || 'pending';
+                    const statusText = {
+                        'pending': 'قيد المعالجة',
+                        'completed': 'مكتمل',
+                        'cancelled': 'ملغي'
+                    }[status] || 'قيد المعالجة';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${rowIndex++}</td>
+                            <td>${order.productName || 'غير معروف'}</td>
+                            <td>${userData.fullName || 'غير مسجل'}</td>
+                            <td>${userData.email || order.userEmail || ''}</td>
+                            <td>${userData.phone || ''}</td>
+                            <td>${order.userData || order.orderDetails || ''}</td>
+                            <td>${date}</td>
+                            <td>
+                                <select class="form-select form-select-sm status-select" data-orderid="${doc.id}" style="min-width:140px;">
+                                    <option value="pending" ${status==='pending'?'selected':''}>قيد المعالجة</option>
+                                    <option value="completed" ${status==='completed'?'selected':''}>مكتمل</option>
+                                    <option value="cancelled" ${status==='cancelled'?'selected':''}>ملغي</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="delOrder('${doc.id}')"><i class="bi bi-x-lg"></i> مسح</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // 4. إضافة أحداث تغيير الحالة
+                document.querySelectorAll('.status-select').forEach(sel => {
+                    sel.addEventListener('change', async (e) => {
+                        const id = sel.dataset.orderid;
+                        const newStatus = sel.value;
+                        await updateDoc(doc(db, "orders", id), { status: newStatus });
+                        renderOrders(); // تحديث الجدول
+                    });
+                });
+
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">خطأ في تحميل الطلبات: ${e.message}</td></tr>`;
+                console.error(e);
+            }
+        }
+
+        // ---------- دوال المنتجات ----------
         window.delP = async (id) => {
             if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
             await deleteDoc(doc(db, "products", id));
@@ -327,7 +496,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // --- إضافة باقة جديدة ---
+        // ---------- إضافة باقة جديدة ----------
         document.getElementById('addPackageBtn').addEventListener('click', () => {
             const row = document.createElement('div');
             row.className = 'package-row row g-2 align-items-center';
@@ -339,7 +508,7 @@
             document.getElementById('packagesContainer').appendChild(row);
         });
 
-        // --- حفظ / تحديث المنتج ---
+        // ---------- حفظ / تحديث المنتج ----------
         document.getElementById('addBtn').addEventListener('click', async () => {
             const name = document.getElementById('pName').value.trim();
             const prompt = document.getElementById('pPrompt').value.trim();
@@ -408,7 +577,14 @@
             renderProducts();
         });
 
-        // --- التحقق من الأدمن ---
+        // ---------- حذف طلب ----------
+        window.delOrder = async (id) => {
+            if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+            await deleteDoc(doc(db, "orders", id));
+            renderOrders();
+        };
+
+        // ---------- التحقق من الأدمن ----------
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === "yasserramadanhoms@gmail.com") {
                 document.getElementById('authStatus').classList.add('d-none');
@@ -416,6 +592,7 @@
                 // إضافة باقة افتراضية
                 document.getElementById('addPackageBtn').click();
                 renderProducts();
+                // تحميل الطلبات عند التبديل إليها فقط (سيتم تحميلها عند النقر على التبويب)
             } else {
                 document.getElementById('authStatus').innerHTML = '⚠️ غير مصرح لك بالدخول. حساب الأدمن فقط.';
             }
