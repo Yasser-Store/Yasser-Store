@@ -6,10 +6,8 @@
     <title>Yasser-Store - المتجر الشامل</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* ===== RESET & BASE ===== */
+        /* ===== الأساسيات ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0d0d0d;
@@ -17,280 +15,232 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1a0033; }
-        ::-webkit-scrollbar-thumb { background: #7c4dff; border-radius: 10px; }
 
-        /* ===== NAVBAR ===== */
+        /* ===== شريط التنقل ===== */
         .navbar-custom {
             background: #1a0033;
             border-bottom: 2px solid #4d0099;
-            padding: 12px 0;
-            position: sticky;
+            padding: 10px 0;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1050;
         }
         .navbar-custom .navbar-brand {
             font-weight: bold;
             color: #fff;
+            font-size: 1.3rem;
         }
-        .btn-custom {
-            background: #7c4dff;
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-weight: 500;
-            transition: 0.3s;
+        .navbar-custom .navbar-brand i {
+            color: #b388ff;
         }
-        .btn-custom:hover {
-            background: #651fff;
-            transform: scale(1.05);
-        }
-        .btn-outline-custom {
-            background: transparent;
-            border: 2px solid #7c4dff;
-            color: #7c4dff;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-        .btn-outline-custom:hover {
-            background: #7c4dff;
-            color: #fff;
-        }
-        .hamburger-btn {
+        .btn-menu {
             background: transparent;
             border: none;
             color: #fff;
             font-size: 1.8rem;
             padding: 0 10px;
         }
-        .hamburger-btn:hover { color: #b388ff; }
+        .btn-menu:hover { color: #b388ff; }
+        .btn-custom {
+            background: #7c4dff;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+        .btn-custom:hover { background: #651fff; transform: scale(1.05); }
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #7c4dff;
+            color: #7c4dff;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .btn-outline-custom:hover { background: #7c4dff; color: #fff; }
+        .btn-danger-sm {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.9rem;
+        }
+        .btn-danger-sm:hover { background: #f44336; }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== القائمة الجانبية (Sidebar) ===== */
         .sidebar {
             position: fixed;
             top: 0;
             right: -320px;
             width: 300px;
             height: 100%;
-            background: #1a0033;
+            background: linear-gradient(180deg, #0d0d0d, #1a0033);
             border-left: 2px solid #4d0099;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1060;
             padding: 20px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
         }
         .sidebar.open { right: 0; }
-        .sidebar .close-btn {
-            background: transparent;
-            border: none;
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1055;
+            display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        .sidebar-logo {
+            text-align: center;
+            padding: 15px 0 20px;
+            border-bottom: 1px solid #4d0099;
+            margin-bottom: 15px;
+        }
+        .sidebar-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #7c4dff;
+            object-fit: cover;
+            background: #1a0033;
+        }
+        .sidebar-logo h5 {
             color: #fff;
-            font-size: 2rem;
-            float: left;
-        }
-        .sidebar .close-btn:hover { color: #f44336; }
-        .sidebar .sidebar-title {
-            font-size: 1.5rem;
+            margin-top: 10px;
             font-weight: bold;
-            color: #b388ff;
-            border-bottom: 2px solid #4d0099;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
         }
-        .sidebar .nav-item {
+
+        .sidebar .nav-link-custom {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 15px;
+            padding: 12px 16px;
+            color: #ccc;
+            text-decoration: none;
             border-radius: 12px;
             transition: 0.3s;
-            cursor: pointer;
-            color: #ddd;
-            text-decoration: none;
             margin-bottom: 5px;
+            font-weight: 500;
         }
-        .sidebar .nav-item:hover {
+        .sidebar .nav-link-custom:hover {
             background: #26004d;
             color: #fff;
             transform: translateX(-5px);
         }
-        .sidebar .nav-item i { font-size: 1.3rem; color: #b388ff; width: 30px; text-align: center; }
-        .sidebar .nav-item .badge { background: #7c4dff; margin-right: auto; }
-
-        /* ===== OVERLAY ===== */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 1055;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
-        }
-        .overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        /* ===== HERO / SLIDER ===== */
-        .hero-slider {
-            margin: 20px 0 30px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(128,0,255,0.3);
-            border: 1px solid #4d0099;
-        }
-        .swiper-slide {
-            position: relative;
-            background: #1a0033;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .swiper-slide img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            display: block;
-        }
-        .swiper-slide .slide-content {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(26,0,51,0.85);
-            backdrop-filter: blur(6px);
-            padding: 15px 20px;
-            border-radius: 15px;
-            border: 1px solid #7c4dff;
-            text-align: center;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-        .swiper-slide .slide-content:hover {
-            background: rgba(124,77,255,0.3);
-            transform: scale(1.02);
-        }
-        .swiper-slide .slide-content h5 {
-            color: #fff;
-            font-weight: bold;
-            margin: 0;
-        }
-        .swiper-slide .slide-content small {
+        .sidebar .nav-link-custom i {
+            font-size: 1.2rem;
+            width: 24px;
             color: #b388ff;
         }
+        .sidebar .nav-link-custom .badge {
+            background: #7c4dff;
+            color: #fff;
+            margin-right: auto;
+        }
+        .sidebar-close {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+        .sidebar-close:hover { color: #f44336; }
 
-        /* ===== STATS ===== */
-        .stats-row {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 20px 0 30px;
+        /* ===== السلايدر ===== */
+        .slider-section {
+            margin-top: 70px;
+            padding: 10px 0;
         }
-        .stat-box {
-            background: #1a0033;
-            border: 1px solid #4d0099;
-            border-radius: 16px;
-            padding: 15px 25px;
-            text-align: center;
-            min-width: 100px;
-            flex: 1;
-            transition: 0.3s;
+        .slider-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(128, 0, 255, 0.3);
+            max-height: 400px;
         }
-        .stat-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(128,0,255,0.3);
+        .slider-container img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 20px;
         }
-        .stat-box i { font-size: 2rem; color: #b388ff; }
-        .stat-box h5 { font-size: 1.8rem; font-weight: bold; margin: 5px 0; }
-        .stat-box p { color: #aaa; margin: 0; font-size: 0.9rem; }
+        .slider-container .carousel-control-prev,
+        .slider-container .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(26, 0, 51, 0.7);
+            border-radius: 50%;
+            border: 1px solid #7c4dff;
+        }
+        .slider-container .carousel-control-prev { left: 15px; }
+        .slider-container .carousel-control-next { right: 15px; }
+        .slider-container .carousel-control-prev:hover,
+        .slider-container .carousel-control-next:hover {
+            background: #7c4dff;
+        }
+        .slider-container .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #7c4dff;
+            background: transparent;
+        }
+        .slider-container .carousel-indicators .active {
+            background: #7c4dff;
+        }
 
-        /* ===== CATEGORY CARDS ===== */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 15px;
-            margin: 20px 0 30px;
+        /* ===== الأقسام الرئيسية ===== */
+        .categories-section {
+            padding: 20px 0;
         }
         .category-card {
             background: #1a0033;
             border: 2px solid #4d0099;
-            border-radius: 18px;
-            padding: 20px 10px;
-            text-align: center;
-            color: #fff;
-            text-decoration: none;
+            border-radius: 20px;
+            overflow: hidden;
             transition: 0.3s;
+            text-decoration: none;
+            display: block;
+            color: #fff;
         }
         .category-card:hover {
             transform: scale(1.05);
             border-color: #7c4dff;
-            box-shadow: 0 8px 25px rgba(128,0,255,0.4);
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.4);
         }
-        .category-card i { font-size: 2.5rem; color: #b388ff; }
-        .category-card h6 { margin-top: 10px; font-weight: bold; font-size: 0.95rem; }
-
-        /* ===== SIDEBAR: NOTES ===== */
-        .note-input {
-            background: #0d0d0d;
-            border: 1px solid #4d0099;
-            border-radius: 12px;
-            color: #fff;
-            padding: 10px;
+        .category-card img {
             width: 100%;
-            resize: vertical;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
         }
-        .note-input:focus {
-            border-color: #7c4dff;
-            outline: none;
-        }
-        .btn-send-note {
-            background: #7c4dff;
-            border: none;
-            color: #fff;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-weight: bold;
-            transition: 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .btn-send-note:hover { background: #651fff; transform: scale(1.02); }
-
-        /* ===== RATING STARS ===== */
-        .stars {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            margin: 10px 0;
-        }
-        .stars .star {
-            color: #555;
-            transition: 0.2s;
-        }
-        .stars .star.active,
-        .stars .star:hover {
-            color: #ffc107;
-            transform: scale(1.2);
-        }
-        .rating-text {
+        .category-card .card-body {
+            padding: 12px;
             text-align: center;
-            color: #aaa;
-            font-size: 0.9rem;
+            background: #1a0033;
+        }
+        .category-card .card-body h6 {
+            font-weight: bold;
+            margin: 0;
+            color: #fff;
         }
 
-        /* ===== BAN MESSAGE ===== */
+        /* ===== رسالة الحظر ===== */
         .ban-message {
             background: linear-gradient(145deg, #2a0033, #4a0033);
             border: 2px solid #d32f2f;
@@ -298,143 +248,294 @@
             padding: 40px 30px;
             text-align: center;
             max-width: 600px;
-            margin: 50px auto;
+            margin: 100px auto;
         }
         .ban-message i { font-size: 4rem; color: #f44336; }
         .ban-message h2 { color: #f44336; font-weight: bold; margin: 15px 0; }
         .ban-message ul { list-style: none; padding: 0; text-align: right; }
         .ban-message ul li { padding: 8px 0; border-bottom: 1px solid #4d0099; }
         .ban-message ul li:last-child { border-bottom: none; }
-        .btn-support { background: #25d366; color: #000; border: none; border-radius: 30px; padding: 12px 30px; font-weight: bold; }
+        .btn-support {
+            background: #25d366;
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+        .btn-support:hover { background: #128c7e; color: #fff; }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 576px) {
-            .stat-box { min-width: 80px; padding: 10px; }
-            .stat-box i { font-size: 1.5rem; }
-            .stat-box h5 { font-size: 1.3rem; }
-            .category-grid { grid-template-columns: repeat(2, 1fr); }
-            .swiper-slide { min-height: 180px; }
-            .swiper-slide img { height: 200px; }
-            .sidebar { width: 280px; right: -300px; }
+        /* ===== التقييم بالنجوم ===== */
+        .star-rating {
+            direction: ltr;
+            font-size: 2rem;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        .star-rating .star {
+            transition: 0.2s;
+        }
+        .star-rating .star:hover,
+        .star-rating .star.active {
+            color: #ffc107;
+            transform: scale(1.2);
+        }
+
+        /* ===== ملاحظة ===== */
+        .note-input {
+            background: #1a0033 !important;
+            color: #fff !important;
+            border: 1px solid #4d0099 !important;
+            border-radius: 12px !important;
+            padding: 10px !important;
+            width: 100%;
+            resize: vertical;
+        }
+        .note-input:focus {
+            border-color: #7c4dff !important;
+            box-shadow: 0 0 0 0.2rem rgba(124, 77, 255, 0.3) !important;
+        }
+
+        /* ===== تحميل ===== */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #1a0033;
+            border-bottom-color: #7c4dff;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .page-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ===== تحسينات عامة ===== */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .section-title i { font-size: 1.8rem; color: #b388ff; }
+        .section-title h4 { color: #fff; font-weight: bold; margin: 0; }
+        .text-muted-custom { color: #888; }
+
+        /* ===== كروت المنتجات في السلايدر ===== */
+        .slider-product-card {
+            position: relative;
+            cursor: pointer;
+            height: 350px;
+            overflow: hidden;
+        }
+        .slider-product-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+        .slider-product-card:hover img {
+            transform: scale(1.08);
+        }
+        .slider-product-card .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            text-align: center;
+        }
+        .slider-product-card .overlay h5 {
+            color: #fff;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        /* ===== استجابة ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 280px; right: -290px; }
+            .slider-container img { height: 220px; }
+            .slider-product-card { height: 220px; }
+            .sidebar-logo img { width: 60px; height: 60px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== OVERLAY ===== -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- ===== SIDEBAR ===== -->
-    <div class="sidebar" id="sidebar">
-        <button class="close-btn" id="closeSidebar"><i class="bi bi-x-lg"></i></button>
-        <div class="sidebar-title"><i class="bi bi-list-ul"></i> القائمة</div>
-
-        <!-- الملف الشخصي -->
-        <a href="profile.html" class="nav-item"><i class="bi bi-person-circle"></i> الملف الشخصي</a>
-
-        <!-- الأقسام -->
-        <a href="games.html" class="nav-item"><i class="bi bi-controller"></i> الألعاب</a>
-        <a href="apps.html" class="nav-item"><i class="bi bi-phone"></i> التطبيقات</a>
-        <a href="social.html" class="nav-item"><i class="bi bi-share"></i> دعم سوشيال</a>
-        <a href="cards.html" class="nav-item"><i class="bi bi-credit-card"></i> بطاقات</a>
-
-        <!-- الملاحظات -->
-        <div class="nav-item" style="flex-direction:column; align-items:stretch; cursor:default;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="bi bi-pencil-square"></i> <span>ملاحظات</span>
-            </div>
-            <textarea id="noteText" class="note-input" rows="2" placeholder="اكتب ملاحظتك..."></textarea>
-            <button id="sendNoteBtn" class="btn-send-note"><i class="bi bi-send"></i> إرسال</button>
-            <div id="noteFeedback" class="text-success small mt-1"></div>
-        </div>
-
-        <!-- مجتمع واتساب -->
-        <a href="https://chat.whatsapp.com/HYuy1uJTM4rFzPTGZD8DWU" target="_blank" class="nav-item"><i class="bi bi-whatsapp" style="color:#25d366;"></i> انضم للمجتمع</a>
-
-        <!-- الدعم الفني -->
-        <a href="https://wa.me/963997160904" target="_blank" class="nav-item"><i class="bi bi-headset" style="color:#25d366;"></i> الدعم الفني</a>
-
-        <!-- تقييم المتجر -->
-        <div class="nav-item" style="flex-direction:column; align-items:stretch; cursor:default;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="bi bi-star-fill" style="color:#ffc107;"></i> <span>قيم المتجر</span>
-            </div>
-            <div class="stars" id="ratingStars">
-                <span class="star" data-value="1">★</span>
-                <span class="star" data-value="2">★</span>
-                <span class="star" data-value="3">★</span>
-                <span class="star" data-value="4">★</span>
-                <span class="star" data-value="5">★</span>
-            </div>
-            <div class="rating-text" id="ratingText">اختر تقييمك</div>
-        </div>
+    <!-- ===== مؤشر التحميل ===== -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader"></div>
     </div>
 
-    <!-- ===== NAVBAR ===== -->
+    <!-- ===== شريط التنقل ===== -->
     <nav class="navbar navbar-custom">
         <div class="container d-flex justify-content-between align-items-center">
             <div>
-                <button class="hamburger-btn" id="openSidebar"><i class="bi bi-list"></i></button>
-                <span class="navbar-brand fw-bold ms-2"><i class="bi bi-shop"></i> Yasser-Store</span>
+                <button class="btn-menu" id="menuToggle"><i class="bi bi-list"></i></button>
             </div>
+            <span class="navbar-brand"><i class="bi bi-shop"></i> Yasser-Store</span>
             <div>
                 <button class="btn btn-custom btn-sm" id="loginBtn">تسجيل الدخول</button>
-                <button class="btn btn-outline-custom btn-sm d-none" id="profileBtn"><i class="bi bi-person"></i> حسابي</button>
-                <button class="btn btn-danger btn-sm d-none" id="logoutBtn"><i class="bi bi-box-arrow-right"></i></button>
+                <button class="btn btn-outline-custom btn-sm d-none" id="profileBtn"><i class="bi bi-person"></i></button>
+                <button class="btn btn-danger-sm btn-sm d-none" id="logoutBtn"><i class="bi bi-box-arrow-right"></i></button>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-2">
+    <!-- ===== القائمة الجانبية ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
 
-        <!-- ===== BAN MESSAGE ===== -->
+        <!-- اللوغو -->
+        <div class="sidebar-logo">
+            <img src="logo.jpg" alt="شعار المتجر" id="logoImage" onerror="this.src='https://ui-avatars.com/api/?name=Y&background=7c4dff&color=fff&size=80'">
+            <h5>Yasser-Store</h5>
+        </div>
+
+        <!-- روابط القائمة -->
+        <a href="profile.html" class="nav-link-custom"><i class="bi bi-person-circle"></i> الملف الشخصي</a>
+
+        <div style="border-top:1px solid #4d0099; margin:10px 0; padding-top:10px;">
+            <div class="text-muted-custom small px-3 mb-2">الأقسام</div>
+            <a href="games.html" class="nav-link-custom"><i class="bi bi-controller"></i> الألعاب</a>
+            <a href="apps.html" class="nav-link-custom"><i class="bi bi-phone"></i> التطبيقات</a>
+            <a href="social.html" class="nav-link-custom"><i class="bi bi-share"></i> دعم سوشيال</a>
+            <a href="cards.html" class="nav-link-custom"><i class="bi bi-credit-card"></i> بطاقات</a>
+        </div>
+
+        <div style="border-top:1px solid #4d0099; margin:10px 0; padding-top:10px;">
+            <div class="text-muted-custom small px-3 mb-2">خدمات</div>
+
+            <!-- الملاحظات -->
+            <div class="px-3 mb-3">
+                <label class="text-muted-custom small">📝 أرسل ملاحظة</label>
+                <textarea id="noteInput" class="note-input" rows="2" placeholder="اكتب ملاحظتك هنا..."></textarea>
+                <button id="sendNoteBtn" class="btn btn-custom btn-sm w-100 mt-1"><i class="bi bi-send"></i> إرسال</button>
+            </div>
+
+            <a href="https://chat.whatsapp.com/HYuy1uJTM4rFzPTGZD8DWU" target="_blank" class="nav-link-custom"><i class="bi bi-whatsapp" style="color:#25d366;"></i> انضم للمجتمع</a>
+            <a href="https://wa.me/963997160904" target="_blank" class="nav-link-custom"><i class="bi bi-headset" style="color:#25d366;"></i> الدعم الفني</a>
+
+            <!-- التقييم -->
+            <div class="px-3 mt-2">
+                <label class="text-muted-custom small">⭐ قيم المتجر</label>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <div id="ratingFeedback" class="text-center small text-muted-custom mt-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== المحتوى الرئيسي ===== -->
+    <div class="container" style="margin-top:70px;">
+
+        <!-- رسالة الحظر -->
         <div id="banMessage" class="ban-message d-none">
             <i class="bi bi-shield-lock"></i>
             <h2>🚫 تم تعليق حسابك مؤقتاً</h2>
-            <p>بناءً على سياسة الاستخدام، تم إيقاف حسابك للأسباب المحتملة التالية:</p>
+            <p>بناءً على سياسة الاستخدام الخاصة بالمتجر، تم إيقاف حسابك للأسباب المحتملة التالية:</p>
             <ul>
                 <li>📌 تقديم طلبات وهمية أو غير حقيقية.</li>
                 <li>📌 نشاط غير معتاد أو مريب تم رصده على حسابك.</li>
             </ul>
-            <p class="text-muted">إذا كنت تعتقد أن هذا القرار خاطئ، يرجى التواصل مع الدعم الفني.</p>
+            <p class="text-muted">إذا كنت تعتقد أن هذا القرار خاطئ، يرجى التواصل مع الدعم الفني عبر الزر أدناه.</p>
             <a href="https://wa.me/963997160904" target="_blank" class="btn btn-support"><i class="bi bi-whatsapp"></i> تواصل مع الدعم</a>
         </div>
 
-        <!-- ===== MAIN CONTENT ===== -->
         <div id="mainContent">
 
-            <!-- ===== SWIPER SLIDER ===== -->
-            <div class="hero-slider">
-                <div class="swiper mySwiper">
-                    <div class="swiper-wrapper" id="sliderWrapper">
-                        <!-- سيتم ملؤها بواسطة JS -->
+            <!-- ===== السلايدر ===== -->
+            <div class="slider-section">
+                <div id="productSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+                    <div class="carousel-indicators" id="sliderIndicators"></div>
+                    <div class="slider-container">
+                        <div class="carousel-inner" id="sliderInner">
+                            <div class="carousel-item active">
+                                <div class="slider-product-card" onclick="window.location.href='index.html'">
+                                    <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=Loading..." alt="تحميل">
+                                    <div class="overlay"><h5>جاري تحميل المنتجات...</h5></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productSlider" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productSlider" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
                     </div>
-                    <div class="swiper-pagination"></div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
                 </div>
             </div>
 
-            <!-- ===== STATS ===== -->
-            <div class="stats-row" id="statsContainer">
-                <div class="stat-box"><i class="bi bi-box-seam"></i><h5 id="statProducts">0</h5><p>منتج</p></div>
-                <div class="stat-box"><i class="bi bi-people"></i><h5 id="statUsers">0</h5><p>مستخدم</p></div>
-                <div class="stat-box"><i class="bi bi-cart-check"></i><h5 id="statOrders">0</h5><p>طلب</p></div>
+            <!-- ===== الأقسام الرئيسية (مع الصور) ===== -->
+            <div class="categories-section">
+                <div class="section-title">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    <h4>الأقسام</h4>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="games.html" class="category-card">
+                            <img src="games.jpg" alt="الألعاب" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=🎮'">
+                            <div class="card-body"><h6>🎮 الألعاب</h6></div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="apps.html" class="category-card">
+                            <img src="apps.jpg" alt="التطبيقات" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=📱'">
+                            <div class="card-body"><h6>📱 التطبيقات</h6></div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="social.html" class="category-card">
+                            <img src="social.jpg" alt="دعم سوشيال" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=🌐'">
+                            <div class="card-body"><h6>🌐 دعم سوشيال</h6></div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="cards.html" class="category-card">
+                            <img src="cards.jpg" alt="بطاقات" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=💳'">
+                            <div class="card-body"><h6>💳 بطاقات</h6></div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- ===== CATEGORIES ===== -->
-            <div class="category-grid">
-                <a href="games.html" class="category-card"><i class="bi bi-controller"></i><h6>الألعاب</h6></a>
-                <a href="apps.html" class="category-card"><i class="bi bi-phone"></i><h6>التطبيقات</h6></a>
-                <a href="social.html" class="category-card"><i class="bi bi-share"></i><h6>دعم سوشيال</h6></a>
-                <a href="cards.html" class="category-card"><i class="bi bi-credit-card"></i><h6>بطاقات</h6></a>
-            </div>
-
-        </div> <!-- end mainContent -->
+        </div><!-- نهاية mainContent -->
     </div>
 
-    <!-- ===== SCRIPTS ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -454,137 +555,167 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // ===== DOM REFS =====
+        // ===== عناصر الصفحة =====
         const loginBtn = document.getElementById('loginBtn');
         const profileBtn = document.getElementById('profileBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const mainContent = document.getElementById('mainContent');
         const banMessage = document.getElementById('banMessage');
+        const loader = document.getElementById('pageLoader');
 
-        // ===== SIDEBAR =====
+        // ===== إخفاء مؤشر التحميل =====
+        setTimeout(() => loader.classList.add('hidden'), 800);
+
+        // ===== القائمة الجانبية =====
+        const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        document.getElementById('openSidebar').addEventListener('click', () => {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-        });
-        document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        function toggleSidebar(open) {
+            sidebar.classList.toggle('open', open);
+            sidebarOverlay.classList.toggle('active', open);
+            document.body.style.overflow = open ? 'hidden' : '';
         }
 
-        // ===== RATING STARS =====
-        const stars = document.querySelectorAll('.star');
-        const ratingText = document.getElementById('ratingText');
-        let selectedRating = 0;
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                selectedRating = parseInt(star.dataset.value);
-                stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating));
-                const msgs = ['', 'سيء جداً', 'سيء', 'متوسط', 'جيد', 'ممتاز'];
-                ratingText.textContent = msgs[selectedRating] || 'اختر تقييمك';
-                // حفظ التقييم (محلياً)
-                localStorage.setItem('storeRating', selectedRating);
-            });
-            // استعادة التقييم المحفوظ
-            const saved = parseInt(localStorage.getItem('storeRating'));
-            if (saved) {
-                selectedRating = saved;
-                stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value) <= saved));
-                const msgs = ['', 'سيء جداً', 'سيء', 'متوسط', 'جيد', 'ممتاز'];
-                ratingText.textContent = msgs[saved] || 'اختر تقييمك';
-            }
+        menuToggle.addEventListener('click', () => toggleSidebar(true));
+        sidebarClose.addEventListener('click', () => toggleSidebar(false));
+        sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
+
+        // ===== تسجيل الدخول/الخروج =====
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch(error => alert("خطأ: " + error.message));
         });
 
-        // ===== SEND NOTE =====
-        document.getElementById('sendNoteBtn').addEventListener('click', async () => {
-            const note = document.getElementById('noteText').value.trim();
-            if (!note) return alert('الرجاء كتابة ملاحظة');
-            const feedback = document.getElementById('noteFeedback');
-            try {
-                const res = await fetch('https://script.google.com/macros/s/AKfycbzzK_n4kr0sNmtMG5kQ4gVsT4a0vldroJGWXK5xTCbjQB4TnnWBPIdGH6zyEDD4A9hOTg/exec', {
-                    method: 'POST',
-                    body: JSON.stringify({ note, action: 'note' })
-                });
-                feedback.textContent = '✅ تم إرسال ملاحظتك!';
-                document.getElementById('noteText').value = '';
-                setTimeout(() => feedback.textContent = '', 4000);
-            } catch (e) {
-                feedback.textContent = '❌ فشل الإرسال';
-                console.error(e);
-            }
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            location.reload();
         });
 
-        // ===== AUTH =====
-        loginBtn.addEventListener('click', () => signInWithPopup(auth, provider).catch(e => alert("خطأ: "+e.message)));
-        logoutBtn.addEventListener('click', async () => { await signOut(auth); location.reload(); });
-
-        // ===== LOAD SLIDER =====
+        // ===== السلايدر =====
         async function loadSlider() {
-            const wrapper = document.getElementById('sliderWrapper');
             try {
                 const q = query(collection(db, "products"), orderBy("name"), limit(10));
                 const snap = await getDocs(q);
+                const inner = document.getElementById('sliderInner');
+                const indicators = document.getElementById('sliderIndicators');
+
                 if (snap.empty) {
-                    wrapper.innerHTML = `<div class="swiper-slide"><div class="slide-content"><h5>لا توجد منتجات</h5></div></div>`;
+                    inner.innerHTML = `
+                        <div class="carousel-item active">
+                            <div class="slider-product-card">
+                                <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=No+Products" alt="لا توجد منتجات">
+                                <div class="overlay"><h5>لا توجد منتجات حالياً</h5></div>
+                            </div>
+                        </div>`;
+                    indicators.innerHTML = '';
                     return;
                 }
-                wrapper.innerHTML = '';
+
+                let items = '';
+                let indicatorsHtml = '';
+                let index = 0;
                 snap.forEach(doc => {
                     const p = doc.data();
-                    const cat = p.category || 'product';
-                    const link = cat + '.html?id=' + doc.id; // توجيه للصفحة المناسبة
-                    wrapper.innerHTML += `
-                        <div class="swiper-slide">
-                            <img src="${p.image || 'https://via.placeholder.com/400x300/1a0033/7c4dff?text=No+Image'}" alt="${p.name}" loading="lazy">
-                            <div class="slide-content" onclick="window.location.href='${link}'">
-                                <h5>${p.name}</h5>
-                                <small>${cat === 'games' ? '🎮' : cat === 'apps' ? '📱' : cat === 'social' ? '🌐' : '💳'} اضغط للتفاصيل</small>
+                    const activeClass = index === 0 ? 'active' : '';
+                    items += `
+                        <div class="carousel-item ${activeClass}">
+                            <div class="slider-product-card" onclick="window.location.href='${p.category}.html'">
+                                <img src="${p.image || 'https://via.placeholder.com/1200x400/1a0033/7c4dff?text=No+Image'}" alt="${p.name}">
+                                <div class="overlay"><h5>${p.name}</h5></div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
+                    indicatorsHtml += `
+                        <button type="button" data-bs-target="#productSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}"></button>`;
+                    index++;
                 });
-                // تفعيل السوايبر بعد تحميل الصور
-                setTimeout(() => {
-                    new Swiper('.mySwiper', {
-                        loop: true,
-                        autoplay: { delay: 7000, disableOnInteraction: false },
-                        pagination: { el: '.swiper-pagination', clickable: true },
-                        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-                        effect: 'slide',
-                        speed: 800,
-                    });
-                }, 100);
+
+                inner.innerHTML = items;
+                indicators.innerHTML = indicatorsHtml;
+
+                // إعادة تشغيل السلايدر
+                const sliderEl = document.getElementById('productSlider');
+                const bsSlider = bootstrap.Carousel.getInstance(sliderEl);
+                if (bsSlider) bsSlider.dispose();
+                new bootstrap.Carousel(sliderEl, { interval: 7000, ride: 'carousel' });
+
             } catch (e) {
-                wrapper.innerHTML = `<div class="swiper-slide"><div class="slide-content"><h5>خطأ في تحميل المنتجات</h5></div></div>`;
-                console.error(e);
+                console.error("خطأ في السلايدر:", e);
+                document.getElementById('sliderInner').innerHTML = `
+                    <div class="carousel-item active">
+                        <div class="slider-product-card">
+                            <img src="https://via.placeholder.com/1200x400/1a0033/d32f2f?text=Error" alt="خطأ">
+                            <div class="overlay"><h5>حدث خطأ في تحميل المنتجات</h5></div>
+                        </div>
+                    </div>`;
             }
         }
 
-        // ===== STATS =====
-        async function loadStats() {
-            try {
-                const [pSnap, uSnap, oSnap] = await Promise.all([
-                    getDocs(collection(db, "products")),
-                    getDocs(collection(db, "users")),
-                    getDocs(collection(db, "orders"))
-                ]);
-                document.getElementById('statProducts').textContent = pSnap.size;
-                document.getElementById('statUsers').textContent = uSnap.size;
-                document.getElementById('statOrders').textContent = oSnap.size;
-            } catch (e) { console.error(e); }
-        }
+        // ===== إرسال الملاحظة =====
+        document.getElementById('sendNoteBtn').addEventListener('click', async () => {
+            const note = document.getElementById('noteInput').value.trim();
+            if (!note) return alert('الرجاء كتابة ملاحظة أولاً!');
+            const btn = document.getElementById('sendNoteBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> جاري الإرسال...';
 
-        // ===== CHECK BAN =====
+            try {
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjd078aW48syj19BIaPXSNmenExVLZm-EJ-j10kl0fwXwMQtU8JVK-JidsNSCGAQzjQA/exec";
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ note, action: 'note' })
+                });
+                alert('✅ تم إرسال ملاحظتك بنجاح!');
+                document.getElementById('noteInput').value = '';
+            } catch (e) {
+                alert('❌ حدث خطأ: ' + e.message);
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send"></i> إرسال';
+        });
+
+        // ===== التقييم بالنجوم =====
+        const stars = document.querySelectorAll('.star');
+        const ratingFeedback = document.getElementById('ratingFeedback');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.value);
+                stars.forEach(s => s.classList.remove('active'));
+                for (let i = 0; i < selectedRating; i++) {
+                    stars[i].classList.add('active');
+                }
+                const messages = ['', '😢 سيء جداً', '🙁 ليس جيداً', '😐 مقبول', '😊 جيد', '🌟 ممتاز!'];
+                ratingFeedback.textContent = messages[selectedRating] || 'شكراً لتقييمك!';
+                // حفظ التقييم (يمكن إرساله لقاعدة البيانات)
+                console.log('تقييم المستخدم:', selectedRating);
+            });
+            star.addEventListener('mouseenter', function() {
+                const val = parseInt(this.dataset.value);
+                stars.forEach(s => s.classList.remove('active'));
+                for (let i = 0; i < val; i++) {
+                    stars[i].classList.add('active');
+                }
+            });
+            star.addEventListener('mouseleave', function() {
+                stars.forEach(s => s.classList.remove('active'));
+                for (let i = 0; i < selectedRating; i++) {
+                    stars[i].classList.add('active');
+                }
+            });
+        });
+
+        // ===== التحقق من حالة المستخدم =====
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loginBtn.classList.add('d-none');
                 profileBtn.classList.remove('d-none');
                 logoutBtn.classList.remove('d-none');
-                profileBtn.onclick = () => window.location.href = 'profile.html';
+                profileBtn.onclick = () => { window.location.href = 'profile.html'; };
 
+                // التحقق من الحظر
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists() && userDoc.data().isBanned === true) {
@@ -593,20 +724,24 @@
                         return;
                     }
                 } catch (e) { console.error(e); }
+
+                banMessage.classList.add('d-none');
+                mainContent.classList.remove('d-none');
+                loadSlider();
+
             } else {
                 loginBtn.classList.remove('d-none');
                 profileBtn.classList.add('d-none');
                 logoutBtn.classList.add('d-none');
+                banMessage.classList.add('d-none');
+                mainContent.classList.remove('d-none');
+                loadSlider();
             }
-            banMessage.classList.add('d-none');
-            mainContent.classList.remove('d-none');
-            loadSlider();
-            loadStats();
         });
 
         // تحميل أولي
         setTimeout(() => {
-            if (!auth.currentUser) { loadSlider(); loadStats(); }
+            if (!auth.currentUser) loadSlider();
         }, 1000);
     </script>
 </body>
