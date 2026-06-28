@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yasser-Store</title>
+    <title>Yasser-Store - المتجر الشامل</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -12,187 +12,324 @@
             color: #f0e6ff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .navbar {
-            background: #1a0033 !important;
+        .navbar-custom {
+            background: #1a0033;
             border-bottom: 2px solid #4d0099;
+            padding: 12px 0;
         }
-        .card-link {
-            text-decoration: none;
-            display: block;
-            transition: transform 0.2s;
-        }
-        .card-link:hover {
-            transform: scale(1.05);
-        }
-        .card {
-            background: linear-gradient(145deg, #1a0033, #26004d);
-            border: 2px solid #4d0099;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .card-img-top {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 13px 13px 0 0;
-        }
-        .card-body {
-            color: #ffffff !important;
-        }
-        .card-body h6 {
-            color: #ffffff !important;
+        .navbar-custom .navbar-brand {
             font-weight: bold;
+            color: #fff;
         }
         .btn-custom {
-            background: #8000ff;
-            color: white;
+            background: #7c4dff;
+            color: #fff;
             border: none;
-            margin-right: 5px;
             border-radius: 30px;
             padding: 8px 20px;
+            font-weight: 500;
+            transition: 0.3s;
         }
         .btn-custom:hover {
-            background: #6a00cc;
+            background: #651fff;
+            transform: scale(1.05);
         }
-
-        /* تنسيق رسالة الحظر */
-        .banned-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 20px;
-        }
-        .banned-card {
-            background: linear-gradient(145deg, #1a0033, #26004d);
-            border: 2px solid #d32f2f;
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #7c4dff;
+            color: #7c4dff;
             border-radius: 30px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
+            padding: 8px 20px;
+            font-weight: 500;
+        }
+        .btn-outline-custom:hover {
+            background: #7c4dff;
+            color: #fff;
+        }
+        .hero-section {
             text-align: center;
-            box-shadow: 0 0 50px rgba(211, 47, 47, 0.3);
-            animation: fadeIn 0.5s ease;
+            padding: 40px 20px;
+            background: linear-gradient(145deg, #1a0033, #26004d);
+            border-radius: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #4d0099;
         }
-        .banned-card .icon {
-            font-size: 4rem;
-            color: #d32f2f;
-            margin-bottom: 20px;
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .banned-card h2 {
+        .stat-card {
+            background: #1a0033;
+            border: 1px solid #4d0099;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.3);
+        }
+        .stat-card i {
+            font-size: 2.5rem;
+            color: #b388ff;
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+        .product-card {
+            background: #1a0033;
+            border: 1px solid #4d0099;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+            cursor: pointer;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.4);
+            border-color: #7c4dff;
+        }
+        .product-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+        .product-card .card-body {
+            padding: 15px;
+            text-align: center;
+        }
+        .product-card .card-body h6 {
             color: #fff;
             font-weight: bold;
+            margin: 0;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 20px;
         }
-        .banned-card p {
-            color: #ccc;
-            line-height: 1.8;
-            font-size: 1.1rem;
+        .section-title i {
+            font-size: 2rem;
+            color: #b388ff;
         }
-        .banned-card ul {
+        .category-link {
+            text-decoration: none;
+            display: block;
+            transition: 0.3s;
+        }
+        .category-link:hover {
+            transform: scale(1.05);
+        }
+        .category-card {
+            background: #1a0033;
+            border: 2px solid #4d0099;
+            border-radius: 20px;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px 10px;
+            transition: 0.3s;
+            color: #fff;
+        }
+        .category-card:hover {
+            border-color: #7c4dff;
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.3);
+        }
+        .category-card i {
+            font-size: 3rem;
+            color: #b388ff;
+        }
+        .category-card h6 {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* رسالة الحظر */
+        .ban-message {
+            background: linear-gradient(145deg, #2a0033, #4a0033);
+            border: 2px solid #d32f2f;
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        .ban-message i {
+            font-size: 4rem;
+            color: #f44336;
+        }
+        .ban-message h2 {
+            color: #f44336;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .ban-message ul {
             list-style: none;
             padding: 0;
             text-align: right;
-            color: #f0e6ff;
-            font-size: 1rem;
         }
-        .banned-card ul li {
+        .ban-message ul li {
             padding: 8px 0;
-            border-bottom: 1px dashed #4d0099;
+            border-bottom: 1px solid #4d0099;
         }
-        .banned-card ul li::before {
-            content: "•";
-            color: #d32f2f;
-            font-weight: bold;
-            margin-left: 10px;
+        .ban-message ul li:last-child {
+            border-bottom: none;
         }
-        .btn-whatsapp {
+        .btn-support {
             background: #25d366;
-            color: #fff;
+            color: #000;
             border: none;
             border-radius: 30px;
             padding: 12px 30px;
             font-weight: bold;
             font-size: 1.1rem;
-            transition: 0.3s;
-            margin-top: 20px;
+            margin-top: 15px;
         }
-        .btn-whatsapp:hover {
+        .btn-support:hover {
             background: #128c7e;
-            transform: scale(1.05);
             color: #fff;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .d-none { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- ====== المحتوى العادي ====== -->
-    <nav class="navbar navbar-dark p-3">
-        <div class="container">
-            <span class="navbar-brand fw-bold">Yasser-Store</span>
+    <nav class="navbar navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand fw-bold"><i class="bi bi-shop"></i> Yasser-Store</span>
             <div>
                 <button class="btn btn-custom btn-sm" id="loginBtn">تسجيل الدخول</button>
-                <button class="btn btn-custom btn-sm d-none" id="profileBtn">البروفايل</button>
+                <button class="btn btn-outline-custom btn-sm d-none" id="profileBtn"><i class="bi bi-person"></i> حسابي</button>
+                <button class="btn btn-danger btn-sm d-none" id="logoutBtn"><i class="bi bi-box-arrow-right"></i></button>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
-        <div class="row g-3">
-            <div class="col-6"><a href="games.html" class="card-link"><div class="card"><img src="games.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>الألعاب</h6></div></div></a></div>
-            <div class="col-6"><a href="apps.html" class="card-link"><div class="card"><img src="apps.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>التطبيقات</h6></div></div></a></div>
-            <div class="col-6"><a href="social.html" class="card-link"><div class="card"><img src="social.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>دعم سوشيال</h6></div></div></a></div>
-            <div class="col-6"><a href="cards.html" class="card-link"><div class="card"><img src="cards.jpg" class="card-img-top"><div class="card-body text-center p-2"><h6>بطاقات</h6></div></div></a></div>
-        </div>
-    </div>
 
-    <!-- ====== رسالة الحظر (مخفية افتراضياً) ====== -->
-    <div id="bannedOverlay" class="banned-overlay d-none">
-        <div class="banned-card">
-            <div class="icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <h2>⛔ تم حظر حسابك</h2>
-            <p>نأسف لإزعاجك، ولكن تم تعليق حسابك مؤقتاً لأحد الأسباب التالية:</p>
+        <!-- ===== رسالة الحظر ===== -->
+        <div id="banMessage" class="ban-message d-none">
+            <i class="bi bi-shield-lock"></i>
+            <h2>🚫 تم تعليق حسابك مؤقتاً</h2>
+            <p>بناءً على سياسة الاستخدام الخاصة بالمتجر، تم إيقاف حسابك للأسباب المحتملة التالية:</p>
             <ul>
-                <li><strong>طلبات وهمية</strong> أو محاولات احتيال.</li>
-                <li><strong>نشاط غير معتاد</strong> على حسابك (مثل محاولات دخول متكررة).</li>
-                <li><strong>مخالفة</strong> لسياسة الاستخدام الخاصة بالمتجر.</li>
+                <li>📌 تقديم طلبات وهمية أو غير حقيقية.</li>
+                <li>📌 نشاط غير معتاد أو مريب تم رصده على حسابك.</li>
             </ul>
-            <p style="margin-top: 20px;">
-                إذا كنت تعتقد أن هذا القرار غير صحيح، أو تريد توضيح الموقف، 
-                <strong>لا تتردد في التواصل مع فريق الدعم الفني</strong> عبر واتساب، وسنرد عليك في أقرب وقت.
-            </p>
-            <a href="https://wa.me/963997160904?text=السلام%20عليكم%2C%20أنا%20المستخدم%20${encodeURIComponent('')}%20وتم%20حظر%20حسابي%20وأريد%20معرفة%20السبب." 
-               target="_blank" 
-               class="btn btn-whatsapp">
-                <i class="bi bi-whatsapp"></i> تواصل مع الدعم الفني
-            </a>
+            <p class="text-muted">إذا كنت تعتقد أن هذا القرار خاطئ، يرجى التواصل مع الدعم الفني عبر الزر أدناه لحل المشكلة.</p>
+            <a href="https://wa.me/963997160904" target="_blank" class="btn btn-support"><i class="bi bi-whatsapp"></i> تواصل مع الدعم</a>
         </div>
+
+        <!-- ===== المحتوى الرئيسي (يظهر فقط إذا لم يكن محظوراً) ===== -->
+        <div id="mainContent">
+
+            <!-- القسم الترحيبي -->
+            <div class="hero-section">
+                <h1>مرحباً بك في Yasser-Store</h1>
+                <p class="text-muted">أكبر متجر متخصص في الألعاب، التطبيقات، البطاقات والدعم السوشيال</p>
+                <div class="mt-3">
+                    <span class="badge bg-primary mx-1">🎮 ألعاب</span>
+                    <span class="badge bg-success mx-1">📱 تطبيقات</span>
+                    <span class="badge bg-warning text-dark mx-1">🌐 سوشيال</span>
+                    <span class="badge bg-info text-dark mx-1">💳 بطاقات</span>
+                </div>
+            </div>
+
+            <!-- الإحصائيات السريعة -->
+            <div class="row g-3 mb-4" id="statsContainer">
+                <div class="col-md-4 col-6">
+                    <div class="stat-card">
+                        <i class="bi bi-box-seam"></i>
+                        <h3 id="statProducts">0</h3>
+                        <p class="text-muted">منتج</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="stat-card">
+                        <i class="bi bi-people"></i>
+                        <h3 id="statUsers">0</h3>
+                        <p class="text-muted">مستخدم</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="stat-card">
+                        <i class="bi bi-cart-check"></i>
+                        <h3 id="statOrders">0</h3>
+                        <p class="text-muted">طلب</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الأقسام الرئيسية (كروت) -->
+            <div class="section-title">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <h4>الأقسام</h4>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <a href="games.html" class="category-link">
+                        <div class="category-card">
+                            <i class="bi bi-controller"></i>
+                            <h6>الألعاب</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="apps.html" class="category-link">
+                        <div class="category-card">
+                            <i class="bi bi-phone"></i>
+                            <h6>التطبيقات</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="social.html" class="category-link">
+                        <div class="category-card">
+                            <i class="bi bi-share"></i>
+                            <h6>دعم سوشيال</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="cards.html" class="category-link">
+                        <div class="category-card">
+                            <i class="bi bi-credit-card"></i>
+                            <h6>بطاقات</h6>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- أحدث المنتجات -->
+            <div class="section-title">
+                <i class="bi bi-clock-history"></i>
+                <h4>أحدث المنتجات</h4>
+            </div>
+            <div class="row g-3" id="latestProducts">
+                <div class="col-12 text-center text-muted py-4">جاري تحميل المنتجات...</div>
+            </div>
+
+        </div> <!-- نهاية mainContent -->
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
-          apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
-          authDomain: "yasser-store-7e736.firebaseapp.com",
-          projectId: "yasser-store-7e736",
-          storageBucket: "yasser-store-7e736.firebasestorage.app",
-          messagingSenderId: "363907199851",
-          appId: "1:363907199851:web:f36f479fa91b53823c922e"
+            apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
+            authDomain: "yasser-store-7e736.firebaseapp.com",
+            projectId: "yasser-store-7e736",
+            storageBucket: "yasser-store-7e736.firebasestorage.app",
+            messagingSenderId: "363907199851",
+            appId: "1:363907199851:web:f36f479fa91b53823c922e"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -202,63 +339,116 @@
 
         const loginBtn = document.getElementById('loginBtn');
         const profileBtn = document.getElementById('profileBtn');
-        const bannedOverlay = document.getElementById('bannedOverlay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mainContent = document.getElementById('mainContent');
+        const banMessage = document.getElementById('banMessage');
 
-        // ---------- دالة التحقق من الحظر ----------
-        async function checkIfBanned(user) {
-            if (!user) return false;
+        // تسجيل الدخول
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch(error => alert("خطأ: " + error.message));
+        });
+
+        // تسجيل الخروج
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            location.reload();
+        });
+
+        // تحميل الإحصائيات
+        async function loadStats() {
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    return data.isBanned === true;
-                }
-                return false;
+                const productsSnap = await getDocs(collection(db, "products"));
+                const usersSnap = await getDocs(collection(db, "users"));
+                const ordersSnap = await getDocs(collection(db, "orders"));
+                document.getElementById('statProducts').textContent = productsSnap.size;
+                document.getElementById('statUsers').textContent = usersSnap.size;
+                document.getElementById('statOrders').textContent = ordersSnap.size;
             } catch (e) {
-                console.error("خطأ في التحقق من الحظر:", e);
-                return false;
+                console.error("خطأ في الإحصائيات:", e);
             }
         }
 
-        // ---------- معالج حالة المصادقة ----------
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // تحقق من الحظر
-                const banned = await checkIfBanned(user);
-                if (banned) {
-                    // عرض رسالة الحظر وإخفاء كل شيء آخر
-                    bannedOverlay.classList.remove('d-none');
-                    document.querySelector('.navbar').classList.add('d-none');
-                    document.querySelector('.container').classList.add('d-none');
-                    loginBtn.classList.add('d-none');
-                    profileBtn.classList.add('d-none');
-                    
-                    // تسجيل الخروج قسراً (يمنع الوصول لأي صفحة)
-                    await signOut(auth);
+        // تحميل أحدث 4 منتجات
+        async function loadLatestProducts() {
+            const container = document.getElementById('latestProducts');
+            try {
+                const q = query(collection(db, "products"), orderBy("name"), limit(4));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    container.innerHTML = '<div class="col-12 text-center text-muted py-4">لا توجد منتجات حالياً</div>';
                     return;
                 }
+                container.innerHTML = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    container.innerHTML += `
+                        <div class="col-6 col-md-3">
+                            <div class="product-card" onclick="window.location.href='product-details.html?id=${doc.id}'">
+                                <img src="${p.image || 'https://via.placeholder.com/200x200/1a0033/7c4dff?text=No+Image'}" alt="${p.name}">
+                                <div class="card-body">
+                                    <h6>${p.name}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                container.innerHTML = '<div class="col-12 text-center text-danger py-4">فشل تحميل المنتجات</div>';
+                console.error(e);
+            }
+        }
 
-                // إذا لم يكن محظوراً، أظهر الأزرار كالمعتاد
+        // التحقق من حالة المستخدم (الحظر + عرض البيانات)
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
                 loginBtn.classList.add('d-none');
                 profileBtn.classList.remove('d-none');
+                logoutBtn.classList.remove('d-none');
                 profileBtn.onclick = () => { window.location.href = 'profile.html'; };
+
+                // 1. التحقق من الحظر
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.isBanned === true) {
+                            // إظهار رسالة الحظر وإخفاء المحتوى
+                            banMessage.classList.remove('d-none');
+                            mainContent.classList.add('d-none');
+                            return; // نوقف التنفيذ هنا
+                        }
+                    }
+                } catch (e) {
+                    console.error("خطأ في التحقق من الحظر:", e);
+                }
+
+                // إذا لم يكن محظوراً، أظهر المحتوى
+                banMessage.classList.add('d-none');
+                mainContent.classList.remove('d-none');
+
+                // تحميل البيانات
+                loadStats();
+                loadLatestProducts();
+
             } else {
+                // مستخدم غير مسجل
                 loginBtn.classList.remove('d-none');
                 profileBtn.classList.add('d-none');
-                // تأكد من إخفاء رسالة الحظر إن ظهرت خطأ
-                bannedOverlay.classList.add('d-none');
-                document.querySelector('.navbar').classList.remove('d-none');
-                document.querySelector('.container').classList.remove('d-none');
+                logoutBtn.classList.add('d-none');
+                banMessage.classList.add('d-none');
+                mainContent.classList.remove('d-none');
+                loadStats();
+                loadLatestProducts();
             }
         });
 
-        // ---------- زر تسجيل الدخول ----------
-        loginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch((error) => {
-                alert("خطأ في تسجيل الدخول: " + error.message);
-            });
-        });
-
+        // تحميل أولي (في حال لم يتم تفعيل onAuthStateChanged فوراً)
+        setTimeout(() => {
+            if (!auth.currentUser) {
+                loadStats();
+                loadLatestProducts();
+            }
+        }, 1000);
     </script>
 </body>
 </html>
