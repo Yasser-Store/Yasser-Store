@@ -8,31 +8,63 @@
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; }
         .navbar { background-color: #1a0033; border-bottom: 2px solid #4d0099; }
-        .card { background-color: #26004d; border: 2px solid #4d0099; border-radius: 15px; overflow: hidden; margin-bottom: 20px; transition: 0.3s; }
-        .card:hover { transform: scale(1.05); }
+        .card { background-color: #26004d; border: 2px solid #4d0099; border-radius: 15px; overflow: hidden; margin-bottom: 20px; transition: 0.3s; cursor: pointer; }
+        .card:hover { transform: scale(1.05); border-color: #8000ff; box-shadow: 0 0 15px rgba(128, 0, 255, 0.5); }
         .card-img-top { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
         .card-body { color: #fff; text-align: center; padding: 10px; }
         .btn-back { background-color: #8000ff; color: white; border: none; padding: 5px 15px; }
+        .modal-content { background-color: #1a0033; border: 2px solid #4d0099; border-radius: 15px; color: white; }
+        .package-item { background-color: #26004d; border: 1px solid #8000ff; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-order { background-color: #8000ff; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: bold; }
+        .custom-input { background-color: #000 !important; color: white !important; border: 1px solid #8000ff !important; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-dark p-3">
     <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand fw-bold">الألعاب</span>
+        <span class="navbar-brand fw-bold">البطاقات</span>
         <button class="btn btn-back" onclick="history.back()">رجوع</button>
     </div>
 </nav>
 
 <div class="container mt-4">
-    <div class="row g-3" id="gamesContainer">
+    <div class="row g-3" id="cardsContainer">
         <h4 class="text-center mt-5 text-secondary">جاري تحميل البطاقات...</h4>
     </div>
 </div>
 
+<!-- المودال -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="modalTitle">اسم البطاقة</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="packagesList"></div>
+        <div id="orderForm" class="d-none">
+            <div class="alert alert-info" style="background-color: #26004d; color: white; border: 1px solid #8000ff;">
+                <strong>الباقة:</strong> <span id="selectedPkgName"></span> <br>
+                <strong>السعر:</strong> <span id="selectedPkgPrice" class="text-warning"></span>
+            </div>
+            <label id="inputPromptText" class="form-label fw-bold mt-2">أدخل البيانات المطلوبة:</label>
+            <input type="text" id="userInput" class="form-control custom-input mb-3" placeholder="اكتب هنا...">
+            <button id="confirmBtn" class="btn btn-order w-100 py-2">تأكيد وإرسال الطلب</button>
+            <button class="btn btn-secondary w-100 py-2 mt-2" onclick="showPackagesOnly()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
@@ -42,37 +74,114 @@
       messagingSenderId: "363907199851",
       appId: "1:363907199851:web:f36f479fa91b53823c922e"
     };
-    const db = getFirestore(initializeApp(firebaseConfig));
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzzK_n4kr0sNmtMG5kQ4gVsT4a0vldroJGWXK5xTCbjQB4TnnWBPIdGH6zyEDD4A9hOTg/exec";
 
-    async function loadGames() {
-        const container = document.getElementById('gamesContainer');
+    window.allProducts = {};
+    let currentProductModal = null;
+
+    async function loadCards() {
+        const container = document.getElementById('cardsContainer');
         try {
             const querySnapshot = await getDocs(collection(db, "products"));
             container.innerHTML = "";
-            let found = false;
-
             querySnapshot.forEach((doc) => {
                 const p = doc.data();
                 if (p.category === "cards") {
-                    found = true;
+                    window.allProducts[doc.id] = p;
                     container.innerHTML += `
                         <div class="col-6 col-md-4">
-                            <div class="card">
+                            <div class="card" onclick="openProductModal('${doc.id}')">
                                 <img src="${p.image}" class="card-img-top">
-                                <div class="card-body"><h6>${p.name}</h6></div>
+                                <div class="card-body"><h6 class="mb-0 fw-bold">${p.name}</h6></div>
                             </div>
                         </div>`;
                 }
             });
-
-            if (!found) {
-                container.innerHTML = "<h4 class='text-center mt-5'>لا توجد ألعاب مضافة حالياً.</h4>";
+            if (container.innerHTML === "") {
+                container.innerHTML = "<h4 class='text-center mt-5 text-secondary'>لا توجد بطاقات مضافة حالياً.</h4>";
             }
         } catch (e) {
-            container.innerHTML = "<h4 class='text-center mt-5'>حدث خطأ في الاتصال.</h4>";
+            container.innerHTML = "<h4 class='text-center mt-5 text-danger'>خطأ في الاتصال.</h4>";
         }
     }
-    loadGames();
+
+    window.openProductModal = (id) => {
+        const product = window.allProducts[id];
+        document.getElementById('modalTitle').innerText = product.name;
+        const packagesList = document.getElementById('packagesList');
+        packagesList.innerHTML = "";
+        product.packages.forEach((pkg, index) => {
+            packagesList.innerHTML += `
+                <div class="package-item">
+                    <div><h5 class="mb-1">${pkg.name}</h5><span class="text-warning fw-bold">${pkg.price}</span></div>
+                    <button class="btn btn-order" onclick="prepareOrder('${id}', ${index})">طلب</button>
+                </div>`;
+        });
+        document.getElementById('packagesList').classList.remove('d-none');
+        document.getElementById('orderForm').classList.add('d-none');
+        if (!currentProductModal) currentProductModal = new bootstrap.Modal(document.getElementById('productModal'));
+        currentProductModal.show();
+    };
+
+    window.prepareOrder = (productId, pkgIndex) => {
+        const product = window.allProducts[productId];
+        const pkg = product.packages[pkgIndex];
+        document.getElementById('selectedPkgName').innerText = pkg.name;
+        document.getElementById('selectedPkgPrice').innerText = pkg.price;
+        document.getElementById('inputPromptText').innerText = product.inputPrompt || "أدخل البيانات:";
+        document.getElementById('packagesList').classList.add('d-none');
+        document.getElementById('orderForm').classList.remove('d-none');
+
+        document.getElementById('confirmBtn').onclick = async () => {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("يجب تسجيل الدخول أولاً قبل إتمام الطلب!");
+                return;
+            }
+
+            const userData = document.getElementById('userInput').value;
+            if (!userData) return alert("الرجاء إدخال البيانات!");
+            
+            const btn = document.getElementById('confirmBtn');
+            btn.disabled = true;
+            btn.innerText = "جاري الإرسال...";
+
+            try {
+                // 1. الحفظ في فايربيس
+                await setDoc(doc(db, "orders", Date.now().toString()), {
+                    userId: user.uid,
+                    productName: product.name, packageName: pkg.name, price: pkg.price,
+                    userData: userData, timestamp: new Date().toLocaleString(), status: "جديد"
+                });
+
+                // 2. الإرسال عبر رابط جوجل سكربت
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ product: product.name, package: pkg.name, price: pkg.price, data: userData })
+                });
+
+                // 3. فتح واتساب
+                const waLink = `https://wa.me/963997160904?text=${encodeURIComponent('مرحباً، أطلب: ' + product.name + ' - ' + pkg.name + ' (' + userData + ')')}`;
+                window.location.href = waLink;
+                if (currentProductModal) currentProductModal.hide();
+            } catch (e) {
+                alert("خطأ: " + e.message);
+                btn.disabled = false;
+                btn.innerText = "تأكيد الطلب";
+            }
+        };
+    };
+
+    window.showPackagesOnly = () => {
+        document.getElementById('packagesList').classList.remove('d-none');
+        document.getElementById('orderForm').classList.add('d-none');
+    };
+
+    loadCards();
 </script>
 </body>
 </html>
