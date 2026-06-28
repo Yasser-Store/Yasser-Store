@@ -32,9 +32,7 @@
             color: #fff;
             font-size: 1.3rem;
         }
-        .navbar-custom .navbar-brand i {
-            color: #b388ff;
-        }
+        .navbar-custom .navbar-brand i { color: #b388ff; }
         .btn-menu {
             background: transparent;
             border: none;
@@ -74,7 +72,7 @@
         }
         .btn-danger-sm:hover { background: #f44336; }
 
-        /* ===== القائمة الجانبية (Sidebar) ===== */
+        /* ===== القائمة الجانبية ===== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -144,11 +142,6 @@
             width: 24px;
             color: #b388ff;
         }
-        .sidebar .nav-link-custom .badge {
-            background: #7c4dff;
-            color: #fff;
-            margin-right: auto;
-        }
         .sidebar-close {
             position: absolute;
             top: 10px;
@@ -177,6 +170,10 @@
             height: 350px;
             object-fit: cover;
             border-radius: 20px;
+            transition: 0.5s;
+        }
+        .slider-container .carousel-item:hover img {
+            transform: scale(1.05);
         }
         .slider-container .carousel-control-prev,
         .slider-container .carousel-control-next {
@@ -205,7 +202,7 @@
             background: #7c4dff;
         }
 
-        /* ===== الأقسام الرئيسية ===== */
+        /* ===== الأقسام الرئيسية (كروت مستطيلة) ===== */
         .categories-section {
             padding: 20px 0;
         }
@@ -220,13 +217,13 @@
             color: #fff;
         }
         .category-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.03);
             border-color: #7c4dff;
             box-shadow: 0 10px 30px rgba(128, 0, 255, 0.4);
         }
         .category-card img {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 4 / 3;
             object-fit: cover;
         }
         .category-card .card-body {
@@ -344,43 +341,10 @@
         .section-title h4 { color: #fff; font-weight: bold; margin: 0; }
         .text-muted-custom { color: #888; }
 
-        /* ===== كروت المنتجات في السلايدر ===== */
-        .slider-product-card {
-            position: relative;
-            cursor: pointer;
-            height: 350px;
-            overflow: hidden;
-        }
-        .slider-product-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-        }
-        .slider-product-card:hover img {
-            transform: scale(1.08);
-        }
-        .slider-product-card .overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            text-align: center;
-        }
-        .slider-product-card .overlay h5 {
-            color: #fff;
-            font-weight: bold;
-            margin: 0;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-
         /* ===== استجابة ===== */
         @media (max-width: 768px) {
             .sidebar { width: 280px; right: -290px; }
             .slider-container img { height: 220px; }
-            .slider-product-card { height: 220px; }
             .sidebar-logo img { width: 60px; height: 60px; }
         }
     </style>
@@ -412,13 +376,11 @@
     <div class="sidebar" id="sidebar">
         <button class="sidebar-close" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
 
-        <!-- اللوغو -->
         <div class="sidebar-logo">
             <img src="logo.jpg" alt="شعار المتجر" id="logoImage" onerror="this.src='https://ui-avatars.com/api/?name=Y&background=7c4dff&color=fff&size=80'">
             <h5>Yasser-Store</h5>
         </div>
 
-        <!-- روابط القائمة -->
         <a href="profile.html" class="nav-link-custom"><i class="bi bi-person-circle"></i> الملف الشخصي</a>
 
         <div style="border-top:1px solid #4d0099; margin:10px 0; padding-top:10px;">
@@ -475,17 +437,14 @@
 
         <div id="mainContent">
 
-            <!-- ===== السلايدر ===== -->
+            <!-- ===== السلايدر (بدون أسماء) ===== -->
             <div class="slider-section">
                 <div id="productSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
                     <div class="carousel-indicators" id="sliderIndicators"></div>
                     <div class="slider-container">
                         <div class="carousel-inner" id="sliderInner">
                             <div class="carousel-item active">
-                                <div class="slider-product-card" onclick="window.location.href='index.html'">
-                                    <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=Loading..." alt="تحميل">
-                                    <div class="overlay"><h5>جاري تحميل المنتجات...</h5></div>
-                                </div>
+                                <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=Loading..." alt="تحميل">
                             </div>
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#productSlider" data-bs-slide="prev">
@@ -498,7 +457,7 @@
                 </div>
             </div>
 
-            <!-- ===== الأقسام الرئيسية (مع الصور) ===== -->
+            <!-- ===== الأقسام الرئيسية (كروت مستطيلة) ===== -->
             <div class="categories-section">
                 <div class="section-title">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -507,25 +466,25 @@
                 <div class="row g-3">
                     <div class="col-6 col-md-3">
                         <a href="games.html" class="category-card">
-                            <img src="games.jpg" alt="الألعاب" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=🎮'">
+                            <img src="games.jpg" alt="الألعاب" onerror="this.src='https://via.placeholder.com/400x300/1a0033/7c4dff?text=🎮'">
                             <div class="card-body"><h6>🎮 الألعاب</h6></div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
                         <a href="apps.html" class="category-card">
-                            <img src="apps.jpg" alt="التطبيقات" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=📱'">
+                            <img src="apps.jpg" alt="التطبيقات" onerror="this.src='https://via.placeholder.com/400x300/1a0033/7c4dff?text=📱'">
                             <div class="card-body"><h6>📱 التطبيقات</h6></div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
                         <a href="social.html" class="category-card">
-                            <img src="social.jpg" alt="دعم سوشيال" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=🌐'">
+                            <img src="social.jpg" alt="دعم سوشيال" onerror="this.src='https://via.placeholder.com/400x300/1a0033/7c4dff?text=🌐'">
                             <div class="card-body"><h6>🌐 دعم سوشيال</h6></div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
                         <a href="cards.html" class="category-card">
-                            <img src="cards.jpg" alt="بطاقات" onerror="this.src='https://via.placeholder.com/400x400/1a0033/7c4dff?text=💳'">
+                            <img src="cards.jpg" alt="بطاقات" onerror="this.src='https://via.placeholder.com/400x300/1a0033/7c4dff?text=💳'">
                             <div class="card-body"><h6>💳 بطاقات</h6></div>
                         </a>
                     </div>
@@ -592,7 +551,7 @@
             location.reload();
         });
 
-        // ===== السلايدر =====
+        // ===== السلايدر (بدون أسماء) =====
         async function loadSlider() {
             try {
                 const q = query(collection(db, "products"), orderBy("name"), limit(10));
@@ -603,10 +562,7 @@
                 if (snap.empty) {
                     inner.innerHTML = `
                         <div class="carousel-item active">
-                            <div class="slider-product-card">
-                                <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=No+Products" alt="لا توجد منتجات">
-                                <div class="overlay"><h5>لا توجد منتجات حالياً</h5></div>
-                            </div>
+                            <img src="https://via.placeholder.com/1200x400/1a0033/7c4dff?text=No+Products" alt="لا توجد منتجات">
                         </div>`;
                     indicators.innerHTML = '';
                     return;
@@ -620,10 +576,9 @@
                     const activeClass = index === 0 ? 'active' : '';
                     items += `
                         <div class="carousel-item ${activeClass}">
-                            <div class="slider-product-card" onclick="window.location.href='${p.category}.html'">
+                            <a href="${p.category}.html" style="display:block; cursor:pointer;">
                                 <img src="${p.image || 'https://via.placeholder.com/1200x400/1a0033/7c4dff?text=No+Image'}" alt="${p.name}">
-                                <div class="overlay"><h5>${p.name}</h5></div>
-                            </div>
+                            </a>
                         </div>`;
                     indicatorsHtml += `
                         <button type="button" data-bs-target="#productSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}"></button>`;
@@ -643,15 +598,12 @@
                 console.error("خطأ في السلايدر:", e);
                 document.getElementById('sliderInner').innerHTML = `
                     <div class="carousel-item active">
-                        <div class="slider-product-card">
-                            <img src="https://via.placeholder.com/1200x400/1a0033/d32f2f?text=Error" alt="خطأ">
-                            <div class="overlay"><h5>حدث خطأ في تحميل المنتجات</h5></div>
-                        </div>
+                        <img src="https://via.placeholder.com/1200x400/1a0033/d32f2f?text=Error" alt="خطأ">
                     </div>`;
             }
         }
 
-        // ===== إرسال الملاحظة =====
+        // ===== إرسال الملاحظة (نفس الكود السابق) =====
         document.getElementById('sendNoteBtn').addEventListener('click', async () => {
             const note = document.getElementById('noteInput').value.trim();
             if (!note) return alert('الرجاء كتابة ملاحظة أولاً!');
@@ -689,7 +641,6 @@
                 }
                 const messages = ['', '😢 سيء جداً', '🙁 ليس جيداً', '😐 مقبول', '😊 جيد', '🌟 ممتاز!'];
                 ratingFeedback.textContent = messages[selectedRating] || 'شكراً لتقييمك!';
-                // حفظ التقييم (يمكن إرساله لقاعدة البيانات)
                 console.log('تقييم المستخدم:', selectedRating);
             });
             star.addEventListener('mouseenter', function() {
@@ -715,7 +666,6 @@
                 logoutBtn.classList.remove('d-none');
                 profileBtn.onclick = () => { window.location.href = 'profile.html'; };
 
-                // التحقق من الحظر
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists() && userDoc.data().isBanned === true) {
