@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم ياسر تيك</title>
+    <title>لوحة تحكم ياسر تيك - الإدارة الشاملة</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; }
         .card { background-color: #26004d; border: 2px solid #4d0099; padding: 20px; color: #fff; margin-bottom: 20px; border-radius: 15px;}
         input, select { background-color: #1a0033 !important; color: white !important; border: 1px solid #4d0099 !important; }
         .btn-primary { background-color: #8000ff; border: none; }
-        .btn-primary:hover { background-color: #6600cc; }
-        #authStatus { padding: 20px; font-size: 1.2rem; text-align: center; }
+        .package-row { background-color: #1a0033; padding: 10px; border-radius: 8px; border: 1px dashed #8000ff; margin-bottom: 10px; }
+        #authStatus { padding: 20px; text-align: center; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -20,10 +20,11 @@
     <div id="authStatus">جاري التحقق من صلاحيات الأدمن...</div>
 
     <div id="adminPanel" class="d-none">
-        
         <div class="card">
-            <h3 class="mb-3">إضافة منتج جديد</h3>
-            <input type="text" id="pName" class="form-control mb-2" placeholder="اسم المنتج">
+            <h3 class="mb-3">إضافة منتج متقدم (باقات)</h3>
+            
+            <!-- معلومات المنتج الأساسية -->
+            <input type="text" id="pName" class="form-control mb-2" placeholder="اسم اللعبة/البرنامج (مثال: ببجي)">
             <select id="pCat" class="form-control mb-2">
                 <option value="games">ألعاب</option>
                 <option value="apps">تطبيقات</option>
@@ -31,29 +32,37 @@
                 <option value="cards">بطاقات</option>
             </select>
             <input type="file" id="pImage" class="form-control mb-3">
-            <button id="addBtn" class="btn btn-primary w-100 py-2">رفع وإضافة المنتج</button>
+            
+            <!-- الرسالة المخصصة -->
+            <input type="text" id="pPrompt" class="form-control mb-3" placeholder="جملة الطلب (مثال: أدخل الـ ID الخاص بك هنا)">
+            
+            <!-- قسم الباقات -->
+            <h5 class="mt-3">باقات المنتج:</h5>
+            <div id="packagesContainer">
+                <!-- سيتم إضافة الباقات هنا -->
+            </div>
+            <button id="addPackageBtn" class="btn btn-outline-light mb-3 btn-sm">+ أضف باقة جديدة (سعر وكمية)</button>
+
+            <button id="addBtn" class="btn btn-primary w-100 py-2 mt-2">رفع وحفظ المنتج بالكامل</button>
         </div>
 
         <div class="card">
             <h3 class="mb-3">المنتجات الحالية</h3>
             <div class="table-responsive">
                 <table class="table table-dark table-hover align-middle">
-                    <thead><tr><th>الاسم</th><th>القسم</th><th>تحكم</th></tr></thead>
-                    <tbody id="pTable">
-                        </tbody>
+                    <thead><tr><th>الاسم</th><th>القسم</th><th>الباقات</th><th>تحكم</th></tr></thead>
+                    <tbody id="pTable"></tbody>
                 </table>
             </div>
         </div>
-        
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    // إعداداتك الصحيحة 100%
     const firebaseConfig = {
       apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
       authDomain: "yasser-store-7e736.firebaseapp.com",
@@ -67,116 +76,102 @@
     const auth = getAuth();
     const db = getFirestore();
 
-    const authStatus = document.getElementById('authStatus');
-    const adminPanel = document.getElementById('adminPanel');
-    const addBtn = document.getElementById('addBtn');
-
-    // 1. التحقق من الهوية أولاً (بدون هذه الخطوة لن تعمل الأزرار)
+    // التحقق من الأدمن
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === "yasserramadanhoms@gmail.com") {
-            authStatus.classList.add('d-none');
-            adminPanel.classList.remove('d-none');
-            renderTable(); // جلب المنتجات فقط بعد التأكد من الهوية
+            document.getElementById('authStatus').classList.add('d-none');
+            document.getElementById('adminPanel').classList.remove('d-none');
+            renderTable();
         } else {
-            authStatus.innerHTML = "<span class='text-danger'>غير مصرح لك بالدخول. يرجى تسجيل الدخول من الصفحة الرئيسية بحساب الأدمن.</span>";
+            document.getElementById('authStatus').innerHTML = "<span class='text-danger'>يرجى تسجيل الدخول كأدمن من الرئيسية.</span>";
         }
     });
 
-    // 2. جلب وعرض المنتجات
+    // إضافة حقل باقة جديدة
+    document.getElementById('addPackageBtn').addEventListener('click', () => {
+        const container = document.getElementById('packagesContainer');
+        const index = container.children.length;
+        const row = document.createElement('div');
+        row.className = 'package-row row g-2 align-items-center';
+        row.innerHTML = `
+            <div class="col-6"><input type="text" class="form-control pkg-name" placeholder="الكمية (مثال: 60UC)"></div>
+            <div class="col-4"><input type="text" class="form-control pkg-price" placeholder="السعر (1$)"></div>
+            <div class="col-2"><button class="btn btn-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()">X</button></div>
+        `;
+        container.appendChild(row);
+    });
+
+    // جلب البيانات
     async function renderTable() {
         const tbody = document.getElementById('pTable');
-        tbody.innerHTML = "<tr><td colspan='3' class='text-center'>جاري التحميل...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' class='text-center'>جاري التحميل...</td></tr>";
         try {
             const snapshot = await getDocs(collection(db, "products"));
             tbody.innerHTML = "";
-            if(snapshot.empty) {
-                tbody.innerHTML = "<tr><td colspan='3' class='text-center'>لا توجد منتجات بعد.</td></tr>";
-                return;
-            }
             snapshot.forEach(docSnap => {
                 const p = docSnap.data();
+                const packagesCount = p.packages ? p.packages.length : 0;
                 tbody.innerHTML += `<tr>
                     <td>${p.name || "بدون اسم"}</td>
                     <td>${p.category || "---"}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning mb-1" onclick="editP('${docSnap.id}', '${p.name}', '${p.category}')">تعديل</button>
-                        <button class="btn btn-sm btn-danger mb-1" onclick="delP('${docSnap.id}')">حذف</button>
-                    </td>
+                    <td>${packagesCount} باقات</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="delP('${docSnap.id}')">حذف</button></td>
                 </tr>`;
             });
         } catch (e) {
-            tbody.innerHTML = `<tr><td colspan='3' class='text-danger text-center'>خطأ: ${e.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan='4' class='text-danger text-center'>خطأ: ${e.message}</td></tr>`;
         }
     }
 
-    // 3. رفع منتج جديد
-    addBtn.addEventListener('click', async () => {
+    // رفع المنتج مع الباقات
+    document.getElementById('addBtn').addEventListener('click', async () => {
         const file = document.getElementById('pImage').files[0];
         const name = document.getElementById('pName').value;
         const category = document.getElementById('pCat').value;
+        const promptMsg = document.getElementById('pPrompt').value || "أدخل بياناتك هنا:";
+        
+        // تجميع الباقات من الحقول
+        const packageRows = document.querySelectorAll('.package-row');
+        let packages = [];
+        packageRows.forEach(row => {
+            const pkgName = row.querySelector('.pkg-name').value;
+            const pkgPrice = row.querySelector('.pkg-price').value;
+            if (pkgName && pkgPrice) packages.push({ name: pkgName, price: pkgPrice });
+        });
 
-        if(!file || !name) {
-            alert("الرجاء كتابة اسم المنتج واختيار صورة!");
-            return;
+        if(!file || !name || packages.length === 0) {
+            return alert("الرجاء إدخال الاسم، الصورة، وإضافة باقة واحدة على الأقل!");
         }
 
-        // تغيير شكل الزر ليعرف المستخدم أن الرفع بدأ
-        addBtn.innerText = "جاري الرفع... الرجاء الانتظار";
-        addBtn.disabled = true;
+        const addBtn = document.getElementById('addBtn');
+        addBtn.innerText = "جاري الرفع..."; addBtn.disabled = true;
         
         try {
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            // رفع الصورة لـ ImgBB
+            const formData = new FormData(); formData.append('image', file);
             const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', { method: 'POST', body: formData });
             const imgData = await res.json();
 
-            // حفظ البيانات في Firestore
+            // حفظ المنتج في فايربيس مع مصفوفة الباقات
             await setDoc(doc(db, "products", Date.now().toString()), {
                 name: name,
                 category: category,
-                image: imgData.data.url
+                image: imgData.data.url,
+                inputPrompt: promptMsg,
+                packages: packages
             });
 
-            alert("تم إضافة المنتج بنجاح!");
-            
-            // تفريغ الحقول وإعادة الزر لطبيعته
-            document.getElementById('pName').value = "";
-            document.getElementById('pImage').value = "";
+            alert("تم إضافة المنتج وباقاته بنجاح!");
+            // إعادة تفريغ الحقول
+            document.getElementById('pName').value = ""; document.getElementById('pPrompt').value = "";
+            document.getElementById('packagesContainer').innerHTML = ""; document.getElementById('pImage').value = "";
             renderTable();
 
-        } catch (e) {
-            alert("حدث خطأ أثناء الرفع: " + e.message);
-        } finally {
-            addBtn.innerText = "رفع وإضافة المنتج";
-            addBtn.disabled = false;
-        }
+        } catch (e) { alert("خطأ: " + e.message); } 
+        finally { addBtn.innerText = "رفع وحفظ المنتج بالكامل"; addBtn.disabled = false; }
     });
 
-    // 4. وظائف التعديل والحذف
-    window.editP = async (id, oldName, oldCat) => {
-        const newName = prompt("تعديل الاسم:", oldName);
-        const newCat = prompt("تعديل القسم (games/apps/social/cards):", oldCat);
-        if (newName && newCat) {
-            try {
-                await updateDoc(doc(db, "products", id), { name: newName, category: newCat });
-                renderTable();
-            } catch (e) {
-                alert("خطأ في التعديل: " + e.message);
-            }
-        }
-    };
-
     window.delP = async (id) => {
-        if(confirm("هل أنت متأكد من حذف هذا المنتج نهائياً؟")) {
-            try {
-                await deleteDoc(doc(db, "products", id));
-                renderTable();
-            } catch (e) {
-                alert("خطأ في الحذف: " + e.message);
-            }
-        }
+        if(confirm("متأكد من الحذف؟")) { await deleteDoc(doc(db, "products", id)); renderTable(); }
     };
 </script>
 </body>
