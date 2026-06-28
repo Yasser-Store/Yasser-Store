@@ -7,6 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        /* نفس التنسيقات السابقة مع إضافة تنسيق جديد لحالة المستخدم */
+        .badge-banned { background: #d32f2f; color: #fff; }
+        .badge-active { background: #4caf50; color: #fff; }
+        .user-status-badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        /* باقي التنسيقات كما هي */
         body {
             background: #0d0d0d;
             color: #f0e6ff;
@@ -83,6 +93,13 @@
         }
         .btn-danger:hover {
             background: #f44336;
+        }
+        .btn-success {
+            background: #4caf50;
+            border: none;
+        }
+        .btn-success:hover {
+            background: #66bb6a;
         }
         .package-row {
             background: #13002b;
@@ -211,6 +228,7 @@
             <ul class="nav nav-pills mb-4 justify-content-center">
                 <li class="nav-item"><a class="nav-link active" id="tabAdd" onclick="switchTab('add')"><i class="bi bi-plus-circle"></i> إضافة منتج</a></li>
                 <li class="nav-item"><a class="nav-link" id="tabOrders" onclick="switchTab('orders')"><i class="bi bi-list-ul"></i> الطلبات</a></li>
+                <li class="nav-item"><a class="nav-link" id="tabUsers" onclick="switchTab('users')"><i class="bi bi-people"></i> المستخدمون</a></li>
             </ul>
 
             <!-- =============================== -->
@@ -266,7 +284,7 @@
             </div>
 
             <!-- =============================== -->
-            <!-- قسم الطلبات (الجديد)             -->
+            <!-- قسم الطلبات (موجود سابقاً)       -->
             <!-- =============================== -->
             <div id="ordersSection" class="d-none">
                 <div class="card">
@@ -291,6 +309,36 @@
                             </thead>
                             <tbody id="ordersTable">
                                 <tr><td colspan="9" class="text-center text-muted">جاري تحميل الطلبات...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =============================== -->
+            <!-- قسم المستخدمين (الجديد)          -->
+            <!-- =============================== -->
+            <div id="usersSection" class="d-none">
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-people"></i>
+                        <h3>جميع المستخدمين المسجلين</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>الاسم الكامل</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>رقم الهاتف</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th>الحالة</th>
+                                    <th>التحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr><td colspan="7" class="text-center text-muted">جاري تحميل المستخدمين...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -332,12 +380,15 @@
         window.switchTab = (tab) => {
             document.getElementById('addSection').classList.toggle('d-none', tab !== 'add');
             document.getElementById('ordersSection').classList.toggle('d-none', tab !== 'orders');
+            document.getElementById('usersSection').classList.toggle('d-none', tab !== 'users');
 
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             if (tab === 'add') document.getElementById('tabAdd').classList.add('active');
             else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
+            else if (tab === 'users') document.getElementById('tabUsers').classList.add('active');
 
             if (tab === 'orders') renderOrders();
+            if (tab === 'users') renderUsers();
         };
 
         // ---------- عرض المنتجات ----------
@@ -372,14 +423,12 @@
             tbody.innerHTML = '<tr><td colspan="9" class="text-center text-secondary">جاري التحميل...</td></tr>';
 
             try {
-                // 1. جلب جميع الطلبات
                 const ordersSnap = await getDocs(collection(db, "orders"));
                 if (ordersSnap.empty) {
                     tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">لا توجد طلبات حتى الآن</td></tr>';
                     return;
                 }
 
-                // 2. جلب جميع المستخدمين (مرة واحدة) لتقليل عدد الطلبات
                 const usersSnap = await getDocs(collection(db, "users"));
                 const usersMap = {};
                 usersSnap.forEach(doc => {
@@ -389,13 +438,11 @@
                 let rowIndex = 1;
                 tbody.innerHTML = '';
 
-                // 3. عرض كل طلب مع بيانات المستخدم
                 for (const doc of ordersSnap.docs) {
                     const order = doc.data();
                     const userId = order.userId || order.userID || '';
                     const userData = usersMap[userId] || {};
 
-                    // استخراج التاريخ
                     let date = 'غير معروف';
                     if (order.createdAt) {
                         date = new Date(order.createdAt.seconds * 1000).toLocaleString('ar-EG');
@@ -433,13 +480,12 @@
                     `;
                 }
 
-                // 4. إضافة أحداث تغيير الحالة
                 document.querySelectorAll('.status-select').forEach(sel => {
                     sel.addEventListener('change', async (e) => {
                         const id = sel.dataset.orderid;
                         const newStatus = sel.value;
                         await updateDoc(doc(db, "orders", id), { status: newStatus });
-                        renderOrders(); // تحديث الجدول
+                        renderOrders();
                     });
                 });
 
@@ -448,6 +494,82 @@
                 console.error(e);
             }
         }
+
+        // ---------- عرض المستخدمين ----------
+        async function renderUsers() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary">جاري التحميل...</td></tr>';
+
+            try {
+                const usersSnap = await getDocs(collection(db, "users"));
+                if (usersSnap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا يوجد مستخدمون مسجلون</td></tr>';
+                    return;
+                }
+
+                let rowIndex = 1;
+                tbody.innerHTML = '';
+
+                for (const doc of usersSnap.docs) {
+                    const user = doc.data();
+                    const userId = doc.id;
+                    const isBanned = user.banned || false;
+                    const statusBadge = isBanned ? 
+                        '<span class="badge-status badge-banned">محظور</span>' : 
+                        '<span class="badge-status badge-active">نشط</span>';
+
+                    // تاريخ التسجيل (إن وجد)
+                    const createdAt = user.createdAt || user.createdAt || 'غير معروف';
+                    let date = 'غير معروف';
+                    if (createdAt && createdAt.seconds) {
+                        date = new Date(createdAt.seconds * 1000).toLocaleString('ar-EG');
+                    } else if (typeof createdAt === 'string') {
+                        date = createdAt;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${rowIndex++}</td>
+                            <td>${user.fullName || 'غير مسجل'}</td>
+                            <td>${user.email || ''}</td>
+                            <td>${user.phone || ''}</td>
+                            <td>${date}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                ${isBanned ? 
+                                    `<button class="btn btn-sm btn-success" onclick="unbanUser('${userId}')"><i class="bi bi-check-circle"></i> فك الحظر</button>` :
+                                    `<button class="btn btn-sm btn-danger" onclick="banUser('${userId}')"><i class="bi bi-slash-circle"></i> حظر</button>`
+                                }
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">خطأ في تحميل المستخدمين: ${e.message}</td></tr>`;
+                console.error(e);
+            }
+        }
+
+        // ---------- دوال حظر/فك الحظر ----------
+        window.banUser = async (userId) => {
+            if (!confirm('هل أنت متأكد من حظر هذا المستخدم؟')) return;
+            try {
+                await updateDoc(doc(db, "users", userId), { banned: true });
+                renderUsers();
+            } catch (e) {
+                alert('خطأ في حظر المستخدم: ' + e.message);
+            }
+        };
+
+        window.unbanUser = async (userId) => {
+            if (!confirm('هل أنت متأكد من فك الحظر عن هذا المستخدم؟')) return;
+            try {
+                await updateDoc(doc(db, "users", userId), { banned: false });
+                renderUsers();
+            } catch (e) {
+                alert('خطأ في فك الحظر: ' + e.message);
+            }
+        };
 
         // ---------- دوال المنتجات ----------
         window.delP = async (id) => {
@@ -589,10 +711,8 @@
             if (user && user.email === "yasserramadanhoms@gmail.com") {
                 document.getElementById('authStatus').classList.add('d-none');
                 document.getElementById('adminPanel').classList.remove('d-none');
-                // إضافة باقة افتراضية
                 document.getElementById('addPackageBtn').click();
                 renderProducts();
-                // تحميل الطلبات عند التبديل إليها فقط (سيتم تحميلها عند النقر على التبويب)
             } else {
                 document.getElementById('authStatus').innerHTML = '⚠️ غير مصرح لك بالدخول. حساب الأدمن فقط.';
             }
