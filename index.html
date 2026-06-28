@@ -9,9 +9,39 @@
     <style>
         body {
             background: #0d0d0d;
-            color: #f0e6ff;
+            color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        /* شريط التحميل */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #1a0033;
+            border-top-color: #7c4dff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .navbar-custom {
             background: #1a0033;
             border-bottom: 2px solid #4d0099;
@@ -28,11 +58,9 @@
             border-radius: 30px;
             padding: 8px 20px;
             font-weight: 500;
-            transition: 0.3s;
         }
         .btn-custom:hover {
             background: #651fff;
-            transform: scale(1.05);
         }
         .btn-outline-custom {
             background: transparent;
@@ -46,109 +74,125 @@
             background: #7c4dff;
             color: #fff;
         }
-        .hero-section {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(145deg, #1a0033, #26004d);
-            border-radius: 30px;
-            margin-bottom: 30px;
-            border: 1px solid #4d0099;
-        }
-        .hero-section h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #b388ff, #7c4dff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stat-card {
+
+        /* الإحصائيات (بسيطة) */
+        .stats-bar {
             background: #1a0033;
-            border: 1px solid #4d0099;
             border-radius: 20px;
-            padding: 20px;
+            padding: 12px 20px;
+            margin-top: 15px;
+            border: 1px solid #4d0099;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .stat-item {
             text-align: center;
-            transition: 0.3s;
+            flex: 1;
+            min-width: 80px;
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.3);
-        }
-        .stat-card i {
-            font-size: 2.5rem;
+        .stat-item i {
+            font-size: 1.5rem;
             color: #b388ff;
         }
-        .stat-card h3 {
-            font-size: 2rem;
+        .stat-item h6 {
+            margin: 0;
             font-weight: bold;
-            margin: 10px 0 5px;
+            color: #fff;
         }
-        .product-card {
-            background: #1a0033;
-            border: 1px solid #4d0099;
+        .stat-item small {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+
+        /* السلايدر */
+        .slider-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
             border-radius: 20px;
+            border: 1px solid #4d0099;
+            background: #1a0033;
+            position: relative;
+        }
+        .slider-track {
+            display: flex;
+            transition: transform 0.7s ease;
+        }
+        .slider-item {
+            min-width: 100%;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .slider-item img {
+            max-width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 2px solid #4d0099;
+            transition: 0.3s;
+        }
+        .slider-item img:hover {
+            transform: scale(1.02);
+            border-color: #7c4dff;
+        }
+        .slider-item h5 {
+            margin-top: 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .slider-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4d0099;
+            border: none;
+            transition: 0.3s;
+        }
+        .slider-dot.active {
+            background: #7c4dff;
+            transform: scale(1.3);
+        }
+
+        /* بطاقات الأقسام (نفس التصميم القديم) */
+        .category-card {
+            background: #26004d;
+            border: 2px solid #4d0099;
+            border-radius: 15px;
             overflow: hidden;
             transition: 0.3s;
             cursor: pointer;
-            height: 100%;
+            text-decoration: none;
+            color: #fff;
+            display: block;
         }
-        .product-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.4);
-            border-color: #7c4dff;
+        .category-card:hover {
+            transform: scale(1.05);
+            border-color: #8000ff;
+            box-shadow: 0 0 20px rgba(128, 0, 255, 0.5);
         }
-        .product-card img {
+        .category-card img {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
+            height: auto;
+            display: block;
         }
-        .product-card .card-body {
-            padding: 15px;
+        .category-card .card-body {
             text-align: center;
+            padding: 10px;
         }
-        .product-card .card-body h6 {
+        .category-card .card-body h6 {
             color: #fff;
             font-weight: bold;
             margin: 0;
-        }
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .section-title i {
-            font-size: 2rem;
-            color: #b388ff;
-        }
-        .category-link {
-            text-decoration: none;
-            display: block;
-            transition: 0.3s;
-        }
-        .category-link:hover {
-            transform: scale(1.05);
-        }
-        .category-card {
-            background: #1a0033;
-            border: 2px solid #4d0099;
-            border-radius: 20px;
-            overflow: hidden;
-            text-align: center;
-            padding: 20px 10px;
-            transition: 0.3s;
-            color: #fff;
-        }
-        .category-card:hover {
-            border-color: #7c4dff;
-            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.3);
-        }
-        .category-card i {
-            font-size: 3rem;
-            color: #b388ff;
-        }
-        .category-card h6 {
-            margin-top: 10px;
-            font-weight: bold;
         }
 
         /* رسالة الحظر */
@@ -168,7 +212,6 @@
         .ban-message h2 {
             color: #f44336;
             font-weight: bold;
-            margin: 15px 0;
         }
         .ban-message ul {
             list-style: none;
@@ -189,8 +232,6 @@
             border-radius: 30px;
             padding: 12px 30px;
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-top: 15px;
         }
         .btn-support:hover {
             background: #128c7e;
@@ -199,6 +240,10 @@
     </style>
 </head>
 <body>
+    <!-- شاشة التحميل -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
 
     <nav class="navbar navbar-custom">
         <div class="container d-flex justify-content-between align-items-center">
@@ -211,111 +256,58 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-3">
 
-        <!-- ===== رسالة الحظر ===== -->
+        <!-- رسالة الحظر -->
         <div id="banMessage" class="ban-message d-none">
             <i class="bi bi-shield-lock"></i>
             <h2>🚫 تم تعليق حسابك مؤقتاً</h2>
-            <p>بناءً على سياسة الاستخدام الخاصة بالمتجر، تم إيقاف حسابك للأسباب المحتملة التالية:</p>
+            <p>بناءً على سياسة الاستخدام، تم إيقاف حسابك للأسباب المحتملة التالية:</p>
             <ul>
                 <li>📌 تقديم طلبات وهمية أو غير حقيقية.</li>
                 <li>📌 نشاط غير معتاد أو مريب تم رصده على حسابك.</li>
             </ul>
-            <p class="text-muted">إذا كنت تعتقد أن هذا القرار خاطئ، يرجى التواصل مع الدعم الفني عبر الزر أدناه لحل المشكلة.</p>
+            <p class="text-muted">إذا كنت تعتقد أن هذا القرار خاطئ، يرجى التواصل مع الدعم الفني.</p>
             <a href="https://wa.me/963997160904" target="_blank" class="btn btn-support"><i class="bi bi-whatsapp"></i> تواصل مع الدعم</a>
         </div>
 
-        <!-- ===== المحتوى الرئيسي (يظهر فقط إذا لم يكن محظوراً) ===== -->
+        <!-- المحتوى الأساسي -->
         <div id="mainContent">
 
-            <!-- القسم الترحيبي -->
-            <div class="hero-section">
-                <h1>مرحباً بك في Yasser-Store</h1>
-                <p class="text-muted">أكبر متجر متخصص في الألعاب، التطبيقات، البطاقات والدعم السوشيال</p>
-                <div class="mt-3">
-                    <span class="badge bg-primary mx-1">🎮 ألعاب</span>
-                    <span class="badge bg-success mx-1">📱 تطبيقات</span>
-                    <span class="badge bg-warning text-dark mx-1">🌐 سوشيال</span>
-                    <span class="badge bg-info text-dark mx-1">💳 بطاقات</span>
+            <!-- شريط الإحصائيات -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <i class="bi bi-box-seam"></i>
+                    <h6 id="statProducts">0</h6>
+                    <small>منتج</small>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-people"></i>
+                    <h6 id="statUsers">0</h6>
+                    <small>مستخدم</small>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-cart-check"></i>
+                    <h6 id="statOrders">0</h6>
+                    <small>طلب</small>
                 </div>
             </div>
 
-            <!-- الإحصائيات السريعة -->
-            <div class="row g-3 mb-4" id="statsContainer">
-                <div class="col-md-4 col-6">
-                    <div class="stat-card">
-                        <i class="bi bi-box-seam"></i>
-                        <h3 id="statProducts">0</h3>
-                        <p class="text-muted">منتج</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-6">
-                    <div class="stat-card">
-                        <i class="bi bi-people"></i>
-                        <h3 id="statUsers">0</h3>
-                        <p class="text-muted">مستخدم</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-6">
-                    <div class="stat-card">
-                        <i class="bi bi-cart-check"></i>
-                        <h3 id="statOrders">0</h3>
-                        <p class="text-muted">طلب</p>
-                    </div>
-                </div>
+            <!-- السلايدر (آخر 10 منتجات) -->
+            <div id="sliderContainer" class="slider-container d-none">
+                <div class="slider-track" id="sliderTrack"></div>
+                <div class="slider-dots" id="sliderDots"></div>
             </div>
 
-            <!-- الأقسام الرئيسية (كروت) -->
-            <div class="section-title">
-                <i class="bi bi-grid-3x3-gap-fill"></i>
-                <h4>الأقسام</h4>
-            </div>
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <a href="games.html" class="category-link">
-                        <div class="category-card">
-                            <i class="bi bi-controller"></i>
-                            <h6>الألعاب</h6>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <a href="apps.html" class="category-link">
-                        <div class="category-card">
-                            <i class="bi bi-phone"></i>
-                            <h6>التطبيقات</h6>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <a href="social.html" class="category-link">
-                        <div class="category-card">
-                            <i class="bi bi-share"></i>
-                            <h6>دعم سوشيال</h6>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <a href="cards.html" class="category-link">
-                        <div class="category-card">
-                            <i class="bi bi-credit-card"></i>
-                            <h6>بطاقات</h6>
-                        </div>
-                    </a>
-                </div>
+            <!-- كروت الأقسام (نفس القديم) -->
+            <div class="row g-3 mt-3">
+                <div class="col-6"><a href="games.html" class="category-card"><img src="games.jpg" class="w-100"><div class="card-body"><h6>الألعاب</h6></div></a></div>
+                <div class="col-6"><a href="apps.html" class="category-card"><img src="apps.jpg" class="w-100"><div class="card-body"><h6>التطبيقات</h6></div></a></div>
+                <div class="col-6"><a href="social.html" class="category-card"><img src="social.jpg" class="w-100"><div class="card-body"><h6>دعم سوشيال</h6></div></a></div>
+                <div class="col-6"><a href="cards.html" class="category-card"><img src="cards.jpg" class="w-100"><div class="card-body"><h6>بطاقات</h6></div></a></div>
             </div>
 
-            <!-- أحدث المنتجات -->
-            <div class="section-title">
-                <i class="bi bi-clock-history"></i>
-                <h4>أحدث المنتجات</h4>
-            </div>
-            <div class="row g-3" id="latestProducts">
-                <div class="col-12 text-center text-muted py-4">جاري تحميل المنتجات...</div>
-            </div>
-
-        </div> <!-- نهاية mainContent -->
+        </div>
     </div>
 
     <script type="module">
@@ -342,113 +334,151 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const mainContent = document.getElementById('mainContent');
         const banMessage = document.getElementById('banMessage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
-        // تسجيل الدخول
-        loginBtn.addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch(error => alert("خطأ: " + error.message));
-        });
+        let sliderInterval = null;
 
-        // تسجيل الخروج
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
-            location.reload();
-        });
+        // إخفاء شاشة التحميل بعد 1.5 ثانية (أو بعد تحميل البيانات)
+        setTimeout(() => loadingOverlay.classList.add('hidden'), 1500);
+
+        // تسجيل الدخول والخروج
+        loginBtn.addEventListener('click', () => signInWithPopup(auth, provider).catch(e => alert("خطأ: " + e.message)));
+        logoutBtn.addEventListener('click', async () => { await signOut(auth); location.reload(); });
 
         // تحميل الإحصائيات
         async function loadStats() {
             try {
-                const productsSnap = await getDocs(collection(db, "products"));
-                const usersSnap = await getDocs(collection(db, "users"));
-                const ordersSnap = await getDocs(collection(db, "orders"));
-                document.getElementById('statProducts').textContent = productsSnap.size;
-                document.getElementById('statUsers').textContent = usersSnap.size;
-                document.getElementById('statOrders').textContent = ordersSnap.size;
-            } catch (e) {
-                console.error("خطأ في الإحصائيات:", e);
-            }
+                const products = await getDocs(collection(db, "products"));
+                const users = await getDocs(collection(db, "users"));
+                const orders = await getDocs(collection(db, "orders"));
+                document.getElementById('statProducts').textContent = products.size;
+                document.getElementById('statUsers').textContent = users.size;
+                document.getElementById('statOrders').textContent = orders.size;
+            } catch (e) { console.error(e); }
         }
 
-        // تحميل أحدث 4 منتجات
-        async function loadLatestProducts() {
-            const container = document.getElementById('latestProducts');
+        // تحميل السلايدر (آخر 10 منتجات)
+        async function loadSlider() {
+            const container = document.getElementById('sliderContainer');
+            const track = document.getElementById('sliderTrack');
+            const dotsContainer = document.getElementById('sliderDots');
+
             try {
-                const q = query(collection(db, "products"), orderBy("name"), limit(4));
+                const q = query(collection(db, "products"), orderBy("name"), limit(10));
                 const snap = await getDocs(q);
                 if (snap.empty) {
-                    container.innerHTML = '<div class="col-12 text-center text-muted py-4">لا توجد منتجات حالياً</div>';
+                    container.classList.add('d-none');
                     return;
                 }
-                container.innerHTML = '';
+
+                container.classList.remove('d-none');
+                track.innerHTML = '';
+                const products = [];
                 snap.forEach(doc => {
                     const p = doc.data();
-                    container.innerHTML += `
-                        <div class="col-6 col-md-3">
-                            <div class="product-card" onclick="window.location.href='product-details.html?id=${doc.id}'">
-                                <img src="${p.image || 'https://via.placeholder.com/200x200/1a0033/7c4dff?text=No+Image'}" alt="${p.name}">
-                                <div class="card-body">
-                                    <h6>${p.name}</h6>
-                                </div>
-                            </div>
-                        </div>
+                    products.push({ id: doc.id, ...p });
+                    // كل منتج يشغل عرض السلايدر بالكامل
+                    const slide = document.createElement('div');
+                    slide.className = 'slider-item';
+                    slide.dataset.category = p.category || 'games';
+                    slide.dataset.productId = doc.id;
+                    slide.innerHTML = `
+                        <img src="${p.image || 'https://via.placeholder.com/600x300/1a0033/7c4dff?text=No+Image'}" alt="${p.name}">
+                        <h5>${p.name}</h5>
                     `;
+                    slide.addEventListener('click', () => {
+                        // توجيه المستخدم للصفحة المناسبة حسب القسم
+                        const cat = slide.dataset.category;
+                        let page = 'games.html';
+                        if (cat === 'apps') page = 'apps.html';
+                        else if (cat === 'social') page = 'social.html';
+                        else if (cat === 'cards') page = 'cards.html';
+                        // نمرر ID المنتج كـ query param عشان نحدد المنتج المطلوب (اختياري)
+                        window.location.href = `${page}?highlight=${slide.dataset.productId}`;
+                    });
+                    track.appendChild(slide);
                 });
+
+                // إنشاء النقاط
+                dotsContainer.innerHTML = '';
+                products.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', () => goToSlide(i));
+                    dotsContainer.appendChild(dot);
+                });
+
+                let currentIndex = 0;
+                const totalSlides = products.length;
+
+                function goToSlide(index) {
+                    if (index < 0) index = totalSlides - 1;
+                    else if (index >= totalSlides) index = 0;
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+                    currentIndex = index;
+                }
+
+                // بدء التبديل التلقائي
+                if (sliderInterval) clearInterval(sliderInterval);
+                sliderInterval = setInterval(() => {
+                    goToSlide(currentIndex + 1);
+                }, 7000);
+
+                // حفظ الدالة في النطاق العام عشان نقدر نستخدمها
+                window.goToSlide = goToSlide;
+
             } catch (e) {
-                container.innerHTML = '<div class="col-12 text-center text-danger py-4">فشل تحميل المنتجات</div>';
-                console.error(e);
+                console.error("خطأ في السلايدر:", e);
+                container.classList.add('d-none');
             }
         }
 
-        // التحقق من حالة المستخدم (الحظر + عرض البيانات)
+        // التحقق من حالة المستخدم
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loginBtn.classList.add('d-none');
                 profileBtn.classList.remove('d-none');
                 logoutBtn.classList.remove('d-none');
-                profileBtn.onclick = () => { window.location.href = 'profile.html'; };
+                profileBtn.onclick = () => window.location.href = 'profile.html';
 
-                // 1. التحقق من الحظر
+                // التحقق من الحظر
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        if (userData.isBanned === true) {
-                            // إظهار رسالة الحظر وإخفاء المحتوى
-                            banMessage.classList.remove('d-none');
-                            mainContent.classList.add('d-none');
-                            return; // نوقف التنفيذ هنا
-                        }
+                    if (userDoc.exists() && userDoc.data().isBanned === true) {
+                        banMessage.classList.remove('d-none');
+                        mainContent.classList.add('d-none');
+                        loadingOverlay.classList.add('hidden');
+                        return;
                     }
-                } catch (e) {
-                    console.error("خطأ في التحقق من الحظر:", e);
-                }
+                } catch (e) { console.error(e); }
 
-                // إذا لم يكن محظوراً، أظهر المحتوى
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
-
-                // تحميل البيانات
                 loadStats();
-                loadLatestProducts();
+                loadSlider();
 
             } else {
-                // مستخدم غير مسجل
                 loginBtn.classList.remove('d-none');
                 profileBtn.classList.add('d-none');
                 logoutBtn.classList.add('d-none');
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
                 loadStats();
-                loadLatestProducts();
+                loadSlider();
             }
+            // إخفاء شاشة التحميل بعد تنفيذ كل شيء
+            loadingOverlay.classList.add('hidden');
         });
 
-        // تحميل أولي (في حال لم يتم تفعيل onAuthStateChanged فوراً)
-        setTimeout(() => {
-            if (!auth.currentUser) {
-                loadStats();
-                loadLatestProducts();
-            }
-        }, 1000);
+        // تحميل أولي للمستخدم غير مسجل
+        if (!auth.currentUser) {
+            loadStats();
+            loadSlider();
+        }
     </script>
 </body>
 </html>
