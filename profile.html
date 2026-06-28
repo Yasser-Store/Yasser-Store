@@ -5,85 +5,454 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الملف الشخصي - Yasser-Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; }
-        .card { background-color: #26004d; border: 2px solid #4d0099; border-radius: 15px; padding: 20px; color: #fff; }
-        h3 { color: #ffffff !important; }
-        label { color: #ffffff !important; margin-bottom: 5px; font-weight: bold; }
-        .btn-save { background-color: #8000ff; color: white; border: none; }
-        .btn-save:hover { background-color: #6a00cc; }
-        input { background-color: #1a0033 !important; color: white !important; border: 1px solid #4d0099 !important; }
-        .btn-secondary { background-color: #4d0099; border: none; }
+        body {
+            background: #0d0d0d;
+            color: #f0e6ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-custom {
+            background: #1a0033;
+            border-bottom: 2px solid #4d0099;
+            padding: 12px 0;
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: bold;
+            color: #fff;
+        }
+        .card {
+            background: linear-gradient(145deg, #1a0033, #26004d);
+            border: 1px solid #6a1b9a;
+            border-radius: 20px;
+            padding: 25px;
+            color: #fff;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.2);
+            transition: all 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 15px 40px rgba(128, 0, 255, 0.4);
+        }
+        input, .form-control {
+            background-color: #1f0040 !important;
+            color: #fff !important;
+            border: 1px solid #7b1fa2 !important;
+            border-radius: 12px !important;
+            padding: 12px !important;
+        }
+        input:focus {
+            border-color: #b388ff !important;
+            box-shadow: 0 0 0 0.2rem rgba(179, 136, 255, 0.3) !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c4dff, #651fff);
+            border: none;
+            border-radius: 30px;
+            padding: 12px;
+            font-weight: bold;
+            transition: 0.3s;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #651fff, #7c4dff);
+        }
+        .btn-danger-outline {
+            background: transparent;
+            border: 2px solid #d32f2f;
+            color: #f44336;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-danger-outline:hover {
+            background: #d32f2f;
+            color: #fff;
+        }
+        .btn-back {
+            background: #8000ff;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .btn-back:hover {
+            background: #6a00cc;
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #7c4dff;
+            background: #1f0040;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .section-title i {
+            font-size: 1.8rem;
+            color: #b388ff;
+        }
+        .table {
+            color: #f0e6ff;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .table thead th {
+            border-bottom: 2px solid #7b1fa2;
+            color: #b388ff;
+            font-weight: 600;
+            padding: 12px;
+        }
+        .table tbody tr {
+            background: #1a0033;
+            border-radius: 12px;
+            transition: 0.2s;
+        }
+        .table tbody tr:hover {
+            background: #2a0055;
+        }
+        .table tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            border: none;
+        }
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .badge-pending { background: #ff9800; color: #000; }
+        .badge-completed { background: #4caf50; color: #fff; }
+        .badge-cancelled { background: #f44336; color: #fff; }
+        .form-label {
+            font-weight: 500;
+            color: #ce93d8;
+        }
+        .email-display {
+            background: #13002b;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px dashed #4d0099;
+            color: #b388ff;
+        }
+        .btn-upload {
+            background: #4d0099;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 15px;
+            font-size: 0.9rem;
+        }
+        .btn-upload:hover {
+            background: #6a00cc;
+        }
     </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <div class="card">
-        <h3 class="text-center mb-4">إعدادات الملف الشخصي</h3>
-        <form id="profileForm">
-            <div class="mb-3">
-                <label>الاسم الكامل</label>
-                <input type="text" id="fullName" class="form-control" required>
+    <!-- شريط علوي -->
+    <nav class="navbar navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand fw-bold"><i class="bi bi-person-circle"></i> ملفي الشخصي</span>
+            <div>
+                <button class="btn btn-danger-outline me-2" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> خروج</button>
+                <button class="btn btn-back" onclick="window.location.href='index.html'"><i class="bi bi-house"></i></button>
             </div>
-            <div class="mb-3">
-                <label>رقم الهاتف</label>
-                <input type="tel" id="phone" class="form-control" required>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div id="loading" class="text-center text-secondary py-5">جاري تحميل بياناتك...</div>
+
+        <div id="profileContent" class="d-none">
+
+            <!-- بطاقة المعلومات الشخصية -->
+            <div class="card">
+                <div class="row g-4 align-items-center">
+                    <div class="col-md-3 text-center">
+                        <img id="profileImage" class="profile-img" src="https://ui-avatars.com/api/?name=User&background=4d0099&color=fff&size=100" alt="الصورة الشخصية">
+                        <div class="mt-2">
+                            <input type="file" id="profileImageInput" class="d-none" accept="image/*">
+                            <button class="btn btn-upload btn-sm" onclick="document.getElementById('profileImageInput').click()"><i class="bi bi-camera"></i> تغيير الصورة</button>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h4 id="displayName" class="fw-bold">اسم المستخدم</h4>
+                        <div class="email-display mb-2"><i class="bi bi-envelope"></i> <span id="userEmail">email@example.com</span></div>
+                        <p class="text-muted">يمكنك تعديل معلوماتك الشخصية أدناه</p>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-save w-100">حفظ البيانات</button>
-        </form>
-        <button class="btn btn-secondary w-100 mt-2" onclick="window.location.href='index.html'">العودة للمتجر</button>
+
+            <!-- نموذج التعديل -->
+            <div class="card">
+                <div class="section-title">
+                    <i class="bi bi-pencil-square"></i>
+                    <h5>تعديل المعلومات</h5>
+                </div>
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label class="form-label">الاسم الكامل</label>
+                        <input type="text" id="fullName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">رقم الهاتف</label>
+                        <input type="tel" id="phone" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-save"></i> حفظ التغييرات</button>
+                </form>
+            </div>
+
+            <!-- سجل الطلبات -->
+            <div class="card">
+                <div class="section-title">
+                    <i class="bi bi-clock-history"></i>
+                    <h5>طلباتي الأخيرة</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>الباقة</th>
+                                <th>السعر</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <tr><td colspan="5" class="text-center text-muted">لا توجد طلبات سابقة</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
-        authDomain: "yasser-store-7e736.firebaseapp.com",
-        projectId: "yasser-store-7e736",
-        storageBucket: "yasser-store-7e736.firebasestorage.app",
-        messagingSenderId: "363907199851",
-        appId: "1:363907199851:web:f36f479fa91b53823c922e"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
+            authDomain: "yasser-store-7e736.firebaseapp.com",
+            projectId: "yasser-store-7e736",
+            storageBucket: "yasser-store-7e736.firebasestorage.app",
+            messagingSenderId: "363907199851",
+            appId: "1:363907199851:web:f36f479fa91b53823c922e"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = 'index.html'; return; }
-        
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            document.getElementById('fullName').value = docSnap.data().fullName || "";
-            document.getElementById('phone').value = docSnap.data().phone || "";
+        const loadingEl = document.getElementById('loading');
+        const contentEl = document.getElementById('profileContent');
+
+        // دالة عرض الطلبات
+        async function loadUserOrders(userId) {
+            const tbody = document.getElementById('ordersTable');
+            try {
+                // محاولة جلب الطلبات الخاصة بالمستخدم
+                const q = query(
+                    collection(db, "orders"),
+                    where("userId", "==", userId),
+                    orderBy("createdAt", "desc")
+                );
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">لا توجد طلبات سابقة</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const o = doc.data();
+                    const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG') : o.timestamp || 'غير معروف';
+                    const status = o.status || 'pending';
+                    const statusText = {
+                        'pending': 'قيد المعالجة',
+                        'completed': 'مكتمل',
+                        'cancelled': 'ملغي'
+                    }[status] || 'قيد المعالجة';
+                    const badgeClass = {
+                        'pending': 'badge-pending',
+                        'completed': 'badge-completed',
+                        'cancelled': 'badge-cancelled'
+                    }[status] || 'badge-pending';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${o.productName || 'غير معروف'}</td>
+                            <td>${o.packageName || ''}</td>
+                            <td>${o.price || ''}</td>
+                            <td>${date}</td>
+                            <td><span class="badge-status ${badgeClass}">${statusText}</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                // إذا فشل الترتيب (قد لا يكون الحقل موجوداً)، نجرب بدون ترتيب
+                try {
+                    const q2 = query(collection(db, "orders"), where("userId", "==", userId));
+                    const snap2 = await getDocs(q2);
+                    if (snap2.empty) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">لا توجد طلبات سابقة</td></tr>`;
+                        return;
+                    }
+                    tbody.innerHTML = '';
+                    snap2.forEach(doc => {
+                        const o = doc.data();
+                        const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG') : o.timestamp || 'غير معروف';
+                        const status = o.status || 'pending';
+                        const statusText = {
+                            'pending': 'قيد المعالجة',
+                            'completed': 'مكتمل',
+                            'cancelled': 'ملغي'
+                        }[status] || 'قيد المعالجة';
+                        const badgeClass = {
+                            'pending': 'badge-pending',
+                            'completed': 'badge-completed',
+                            'cancelled': 'badge-cancelled'
+                        }[status] || 'badge-pending';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${o.productName || 'غير معروف'}</td>
+                                <td>${o.packageName || ''}</td>
+                                <td>${o.price || ''}</td>
+                                <td>${date}</td>
+                                <td><span class="badge-status ${badgeClass}">${statusText}</span></td>
+                            </tr>
+                        `;
+                    });
+                } catch (e2) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">فشل تحميل الطلبات</td></tr>`;
+                }
+            }
         }
-    });
 
-    document.getElementById('profileForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const user = auth.currentUser;
-        const fullName = document.getElementById('fullName').value;
-        const phone = document.getElementById('phone').value;
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
 
-        await setDoc(doc(db, "users", user.uid), { fullName, phone }, { merge: true });
+            // عرض البريد الإلكتروني
+            document.getElementById('userEmail').textContent = user.email || 'غير مسجل';
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjd078aW48syj19BIaPXSNmenExVLZm-EJ-j10kl0fwXwMQtU8JVK-JidsNSCGAQzjQA/exec";
-        
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({ fullName, phone, action: "update_profile" })
+            // جلب بيانات المستخدم من Firestore
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            let userData = {};
+            if (docSnap.exists()) {
+                userData = docSnap.data();
+            }
+
+            // تعبئة الحقول
+            document.getElementById('fullName').value = userData.fullName || '';
+            document.getElementById('phone').value = userData.phone || '';
+            document.getElementById('displayName').textContent = userData.fullName || user.email || 'مستخدم';
+
+            // تعيين الصورة الشخصية (إن وجدت)
+            if (userData.photoURL) {
+                document.getElementById('profileImage').src = userData.photoURL;
+            } else if (user.photoURL) {
+                document.getElementById('profileImage').src = user.photoURL;
+            } else {
+                const name = userData.fullName || 'User';
+                document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4d0099&color=fff&size=100`;
+            }
+
+            // تحميل الطلبات
+            await loadUserOrders(user.uid);
+
+            // إخفاء التحميل وإظهار المحتوى
+            loadingEl.classList.add('d-none');
+            contentEl.classList.remove('d-none');
+
+            // --- حدث رفع الصورة ---
+            document.getElementById('profileImageInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('image', file);
+                try {
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const imgData = await res.json();
+                    if (imgData.success) {
+                        const imageUrl = imgData.data.url;
+                        // تحديث في Firestore
+                        await setDoc(doc(db, "users", user.uid), { photoURL: imageUrl }, { merge: true });
+                        // تحديث في Firebase Auth (اختياري)
+                        await updateProfile(user, { photoURL: imageUrl });
+                        // تحديث الواجهة
+                        document.getElementById('profileImage').src = imageUrl;
+                        alert('تم تحديث الصورة بنجاح!');
+                    } else {
+                        alert('فشل رفع الصورة');
+                    }
+                } catch (err) {
+                    alert('خطأ: ' + err.message);
+                }
+                e.target.value = '';
+            });
+
+            // --- حدث تسجيل الخروج ---
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                    await signOut(auth);
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // --- حدث حفظ البيانات ---
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+
+                if (!fullName || !phone) {
+                    alert('الرجاء ملء جميع الحقول');
+                    return;
+                }
+
+                try {
+                    await setDoc(doc(db, "users", user.uid), { fullName, phone }, { merge: true });
+                    // تحديث الاسم في Firebase Auth
+                    await updateProfile(user, { displayName: fullName });
+                    // تحديث الواجهة
+                    document.getElementById('displayName').textContent = fullName;
+                    
+                    // إرسال إلى Google Script (كما كان موجوداً)
+                    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjd078aW48syj19BIaPXSNmenExVLZm-EJ-j10kl0fwXwMQtU8JVK-JidsNSCGAQzjQA/exec";
+                    fetch(SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        body: JSON.stringify({ fullName, phone, action: "update_profile" })
+                    });
+
+                    alert('تم تحديث معلوماتك بنجاح!');
+                } catch (err) {
+                    alert('حدث خطأ: ' + err.message);
+                }
+            });
         });
 
-        alert("تم تحديث معلوماتك وإرسالها للمتجر بنجاح!");
-    });
-</script>
-
+    </script>
 </body>
 </html>
