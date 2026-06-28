@@ -2,97 +2,104 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم Yasser-Store</title>
+    <title>لوحة تحكم ياسر تيك - الإدارة الشاملة</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; }
-        .panel-card { background-color: #26004d; border: 2px solid #4d0099; border-radius: 15px; padding: 25px; margin-top: 20px; }
-        .form-control { background-color: #1a0033 !important; color: white !important; border: 1px solid #4d0099 !important; }
-        .btn-action { background-color: #8000ff; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; }
-        .status-msg { padding: 15px; border-radius: 8px; margin-top: 20px; }
+        body { background-color: #000; color: #fff; }
+        .card { background-color: #26004d; border: 2px solid #4d0099; padding: 20px; color: #fff; margin-bottom: 20px; }
+        input, select { background-color: #1a0033 !important; color: white !important; border: 1px solid #4d0099 !important; }
     </style>
 </head>
 <body>
 
 <div class="container mt-5">
-    <div id="status" class="status-msg text-center">جاري التحقق من الهوية...</div>
-    
-    <div id="adminPanel" class="panel-card d-none">
-        <h3 class="text-center">إضافة منتج جديد</h3>
-        <input type="text" id="pName" class="form-control mb-3" placeholder="اسم المنتج">
-        <select id="pCategory" class="form-control mb-3">
+    <div class="card">
+        <h3>إضافة منتج جديد</h3>
+        <input type="text" id="pName" class="form-control mb-2" placeholder="اسم المنتج">
+        <select id="pCat" class="form-control mb-2">
             <option value="games">ألعاب</option>
             <option value="apps">تطبيقات</option>
-            <option value="social">دعم سوشيال</option>
+            <option value="social">سوشيال</option>
             <option value="cards">بطاقات</option>
         </select>
-        <input type="file" id="pImage" class="form-control mb-3">
-        <button id="addBtn" class="btn btn-action">رفع وحفظ المنتج</button>
+        <input type="file" id="pImage" class="form-control mb-2">
+        <button id="addBtn" class="btn btn-primary w-100">إضافة المنتج</button>
+    </div>
+
+    <div class="card">
+        <h3>قائمة المنتجات</h3>
+        <table class="table table-dark">
+            <thead><tr><th>الاسم</th><th>القسم</th><th>تحكم</th></tr></thead>
+            <tbody id="pTable"></tbody>
+        </table>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
-      authDomain: "yasser-store-7e736.firebaseapp.com",
-      projectId: "yasser-store-7e736",
-      storageBucket: "yasser-store-7e736.firebasestorage.app",
-      messagingSenderId: "363907199851",
-      appId: "1:363907199851:web:f36f479fa91b53823c922e"
+    const firebaseConfig = { /* (إعداداتك) */ };
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    // جلب وعرض المنتجات
+    async function renderTable() {
+        const snapshot = await getDocs(collection(db, "products"));
+        const tbody = document.getElementById('pTable');
+        tbody.innerHTML = "";
+        snapshot.forEach(docSnap => {
+            const p = docSnap.data();
+            tbody.innerHTML += `<tr>
+                <td>${p.name}</td>
+                <td>${p.category}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="editP('${docSnap.id}', '${p.name}', '${p.category}')">تعديل</button>
+                    <button class="btn btn-sm btn-danger" onclick="delP('${docSnap.id}')">حذف</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    // دالة التعديل المتكاملة
+    window.editP = async (id, oldName, oldCat) => {
+        const newName = prompt("الاسم الجديد:", oldName);
+        const newCat = prompt("القسم الجديد (games/apps/social/cards):", oldCat);
+        if (newName && newCat) {
+            await updateDoc(doc(db, "products", id), { name: newName, category: newCat });
+            alert("تم التعديل!");
+            renderTable();
+        }
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
-    const statusDiv = document.getElementById('status');
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            statusDiv.innerHTML = "يجب تسجيل الدخول أولاً من الصفحة الرئيسية!";
-            return;
+    window.delP = async (id) => {
+        if(confirm("متأكد من الحذف؟")) {
+            await deleteDoc(doc(db, "products", id));
+            renderTable();
         }
-        
-        if (user.email === "yasserramadanhoms@gmail.com") {
-            statusDiv.classList.add('d-none');
-            document.getElementById('adminPanel').classList.remove('d-none');
-        } else {
-            statusDiv.innerHTML = "عذراً، هذا الحساب ليس أدمن: " + user.email;
-        }
-    });
+    };
 
+    // إضافة منتج جديد (مع رفع الصورة)
     document.getElementById('addBtn').addEventListener('click', async () => {
-        const fileInput = document.getElementById('pImage');
-        if (!fileInput.files[0]) { alert("يرجى اختيار صورة!"); return; }
-
-        statusDiv.classList.remove('d-none');
-        statusDiv.innerHTML = "جاري رفع الصورة...";
-
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
+        const file = document.getElementById('pImage').files[0];
+        if(!file) return alert("اختر صورة!");
         
-        try {
-            const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
-                method: 'POST', body: formData
-            });
-            const imgData = await res.json();
-            
-            await setDoc(doc(db, "products", Date.now().toString()), {
-                name: document.getElementById('pName').value,
-                category: document.getElementById('pCategory').value,
-                image: imgData.data.url
-            });
+        // رفع الصورة
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', { method: 'POST', body: formData });
+        const imgData = await res.json();
 
-            statusDiv.innerHTML = "تمت العملية بنجاح! المنتج الآن في قاعدة البيانات.";
-            alert("تم!");
-        } catch (err) {
-            statusDiv.innerHTML = "خطأ في الرفع: " + err.message;
-        }
+        // حفظ في فايربيس
+        await setDoc(doc(db, "products", Date.now().toString()), {
+            name: document.getElementById('pName').value,
+            category: document.getElementById('pCat').value,
+            image: imgData.data.url
+        });
+        alert("تم الإضافة!");
+        renderTable();
     });
+
+    renderTable();
 </script>
 </body>
 </html>
