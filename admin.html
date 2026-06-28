@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم ياسر تيك - الإدارة الشاملة</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -10,6 +11,15 @@
             background: #0d0d0d;
             color: #f0e6ff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-custom {
+            background: #1a0033;
+            border-bottom: 2px solid #4d0099;
+            padding: 12px 0;
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: bold;
+            color: #fff;
         }
         .card {
             background: linear-gradient(145deg, #1a0033, #26004d);
@@ -43,6 +53,7 @@
             font-weight: bold;
             letter-spacing: 0.5px;
             transition: 0.3s;
+            color: #fff;
         }
         .btn-primary:hover {
             transform: scale(1.02);
@@ -56,6 +67,22 @@
         .btn-outline-light:hover {
             background: #b388ff;
             color: #1a0033;
+        }
+        .btn-warning {
+            background: #ffab00;
+            border: none;
+            color: #1a0033;
+            font-weight: bold;
+        }
+        .btn-warning:hover {
+            background: #ffc107;
+        }
+        .btn-danger {
+            background: #d32f2f;
+            border: none;
+        }
+        .btn-danger:hover {
+            background: #f44336;
         }
         .package-row {
             background: #13002b;
@@ -89,7 +116,7 @@
             vertical-align: middle;
             border: none;
         }
-        .nav-link {
+        .nav-pills .nav-link {
             color: #aaa;
             font-weight: 500;
             padding: 10px 20px;
@@ -97,12 +124,12 @@
             margin: 0 5px;
             transition: 0.3s;
         }
-        .nav-link.active {
+        .nav-pills .nav-link.active {
             color: #fff;
             background: #7c4dff;
             box-shadow: 0 4px 15px rgba(124, 77, 255, 0.5);
         }
-        .nav-link:hover:not(.active) {
+        .nav-pills .nav-link:hover:not(.active) {
             color: #fff;
             background: #2a0055;
         }
@@ -118,6 +145,7 @@
             padding: 8px 16px;
             border-radius: 30px;
             font-weight: 500;
+            font-size: 0.9rem;
         }
         .badge-pending { background: #ff9800; color: #000; }
         .badge-completed { background: #4caf50; color: #fff; }
@@ -136,478 +164,495 @@
             font-weight: 500;
             color: #ce93d8;
         }
+        .status-select {
+            min-width: 140px;
+            background-color: #1f0040 !important;
+            color: #fff !important;
+            border: 1px solid #7b1fa2 !important;
+            border-radius: 12px !important;
+            padding: 6px 12px !important;
+        }
     </style>
 </head>
 <body>
 
-<div class="container mt-4">
-    <div id="authStatus">🔐 جاري التحقق من صلاحيات الأدمن...</div>
-
-    <div id="adminPanel" class="d-none">
-
-        <!-- التبويبات -->
-        <ul class="nav nav-pills mb-4 justify-content-center">
-            <li class="nav-item"><a class="nav-link active" id="tabAdd" onclick="switchTab('add')"><i class="bi bi-plus-circle"></i> إضافة منتج</a></li>
-            <li class="nav-item"><a class="nav-link" id="tabOrders" onclick="switchTab('orders')"><i class="bi bi-list-ul"></i> الطلبات</a></li>
-            <li class="nav-item"><a class="nav-link" id="tabCategories" onclick="switchTab('categories')"><i class="bi bi-tags"></i> الأقسام</a></li>
-        </ul>
-
-        <!-- قسم إضافة/تعديل المنتجات -->
-        <div id="addSection">
-            <div class="card">
-                <div class="section-title">
-                    <i class="bi bi-box-seam"></i>
-                    <h3 id="formTitle">إضافة منتج جديد</h3>
-                </div>
-                <input type="text" id="pName" class="form-control mb-3" placeholder="اسم اللعبة / البرنامج">
-                
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-folder"></i> القسم</label>
-                        <select id="pCat" class="form-control"></select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-image"></i> صورة المنتج</label>
-                        <input type="file" id="pImage" class="form-control" accept="image/*">
-                    </div>
-                </div>
-
-                <input type="text" id="pPrompt" class="form-control mb-3" placeholder="جملة الطلب (مثال: أرسل معرفك)">
-
-                <label class="form-label"><i class="bi bi-grid-3x3-gap-fill"></i> الباقات</label>
-                <div id="packagesContainer"></div>
-                <button id="addPackageBtn" class="btn btn-outline-light btn-sm mb-3"><i class="bi bi-plus-lg"></i> أضف باقة</button>
-
-                <button id="addBtn" class="btn btn-primary w-100 py-2"><i class="bi bi-save"></i> حفظ المنتج</button>
-            </div>
-
-            <!-- قائمة المنتجات -->
-            <div class="card">
-                <div class="section-title">
-                    <i class="bi bi-grid"></i>
-                    <h3>المنتجات الحالية</h3>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead><tr><th>الاسم</th><th>القسم</th><th>التحكم</th></tr></thead>
-                        <tbody id="pTable"></tbody>
-                    </table>
-                </div>
-            </div>
+    <!-- شريط علوي يشبه المتجر -->
+    <nav class="navbar navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand fw-bold"><i class="bi bi-speedometer2"></i> لوحة التحكم</span>
+            <button class="btn btn-back" onclick="window.location.href='index.html'" style="background:#8000ff; color:#fff; border:none; padding:5px 15px; border-radius:30px;">
+                <i class="bi bi-house"></i> المتجر
+            </button>
         </div>
+    </nav>
 
-        <!-- قسم الطلبات -->
-        <div id="ordersSection" class="d-none">
-            <div class="card">
-                <div class="section-title">
-                    <i class="bi bi-cart-check"></i>
-                    <h3>طلبات الزبائن</h3>
+    <div class="container mt-4">
+        <div id="authStatus">🔐 جاري التحقق من صلاحيات الأدمن...</div>
+
+        <div id="adminPanel" class="d-none">
+
+            <!-- التبويبات -->
+            <ul class="nav nav-pills mb-4 justify-content-center">
+                <li class="nav-item"><a class="nav-link active" id="tabAdd" onclick="switchTab('add')"><i class="bi bi-plus-circle"></i> إضافة منتج</a></li>
+                <li class="nav-item"><a class="nav-link" id="tabOrders" onclick="switchTab('orders')"><i class="bi bi-list-ul"></i> الطلبات</a></li>
+                <li class="nav-item"><a class="nav-link" id="tabCategories" onclick="switchTab('categories')"><i class="bi bi-tags"></i> الأقسام</a></li>
+            </ul>
+
+            <!-- قسم إضافة/تعديل المنتجات -->
+            <div id="addSection">
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-box-seam"></i>
+                        <h3 id="formTitle">إضافة منتج جديد</h3>
+                    </div>
+                    <input type="text" id="pName" class="form-control mb-3" placeholder="اسم اللعبة / البرنامج">
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-folder"></i> القسم</label>
+                            <select id="pCat" class="form-control"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-image"></i> صورة المنتج</label>
+                            <input type="file" id="pImage" class="form-control" accept="image/*">
+                            <small class="text-muted">اتركه فارغاً للحفاظ على الصورة الحالية (في حالة التعديل).</small>
+                        </div>
+                    </div>
+
+                    <input type="text" id="pPrompt" class="form-control mb-3" placeholder="جملة الطلب (مثال: أرسل معرفك)">
+
+                    <label class="form-label"><i class="bi bi-grid-3x3-gap-fill"></i> الباقات</label>
+                    <div id="packagesContainer"></div>
+                    <button id="addPackageBtn" class="btn btn-outline-light btn-sm mb-3"><i class="bi bi-plus-lg"></i> أضف باقة</button>
+
+                    <button id="addBtn" class="btn btn-primary w-100 py-2"><i class="bi bi-save"></i> حفظ المنتج</button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>المنتج</th>
-                                <th>العميل</th>
-                                <th>البريد</th>
-                                <th>الهاتف</th>
-                                <th>التفاصيل</th>
-                                <th>التاريخ</th>
-                                <th>الحالة</th>
-                                <th>تحكم</th>
-                            </tr>
-                        </thead>
-                        <tbody id="oTable"></tbody>
-                    </table>
+
+                <!-- قائمة المنتجات -->
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-grid"></i>
+                        <h3>المنتجات الحالية</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead><tr><th>الاسم</th><th>القسم</th><th>التحكم</th></tr></thead>
+                            <tbody id="pTable"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- قسم الأقسام -->
-        <div id="categoriesSection" class="d-none">
-            <div class="card">
-                <div class="section-title">
-                    <i class="bi bi-tags"></i>
-                    <h3>إدارة الأقسام</h3>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-8">
-                        <input type="text" id="newCategoryName" class="form-control" placeholder="اسم القسم الجديد">
+            <!-- قسم الطلبات -->
+            <div id="ordersSection" class="d-none">
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-cart-check"></i>
+                        <h3>طلبات الزبائن</h3>
                     </div>
-                    <div class="col-md-4">
-                        <button id="addCategoryBtn" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> أضف قسم</button>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>العميل</th>
+                                    <th>البريد</th>
+                                    <th>الهاتف</th>
+                                    <th>التفاصيل</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>تحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="oTable"></tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead><tr><th>#</th><th>اسم القسم</th><th>تحكم</th></tr></thead>
-                        <tbody id="cTable"></tbody>
-                    </table>
                 </div>
             </div>
-        </div>
 
+            <!-- قسم الأقسام -->
+            <div id="categoriesSection" class="d-none">
+                <div class="card">
+                    <div class="section-title">
+                        <i class="bi bi-tags"></i>
+                        <h3>إدارة الأقسام</h3>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <input type="text" id="newCategoryName" class="form-control" placeholder="اسم القسم الجديد">
+                        </div>
+                        <div class="col-md-4">
+                            <button id="addCategoryBtn" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> أضف قسم</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead><tr><th>#</th><th>اسم القسم</th><th>تحكم</th></tr></thead>
+                            <tbody id="cTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
-      authDomain: "yasser-store-7e736.firebaseapp.com",
-      projectId: "yasser-store-7e736",
-      storageBucket: "yasser-store-7e736.firebasestorage.app",
-      messagingSenderId: "363907199851",
-      appId: "1:363907199851:web:f36f479fa91b53823c922e"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth();
-
-    let editingProductId = null; // لتخزين معرف المنتج الجاري تعديله
-
-    // دوال التبويبات
-    window.switchTab = (tab) => {
-        document.getElementById('addSection').classList.toggle('d-none', tab !== 'add');
-        document.getElementById('ordersSection').classList.toggle('d-none', tab !== 'orders');
-        document.getElementById('categoriesSection').classList.toggle('d-none', tab !== 'categories');
-
-        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-        if (tab === 'add') document.getElementById('tabAdd').classList.add('active');
-        else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
-        else if (tab === 'categories') document.getElementById('tabCategories').classList.add('active');
-
-        // تحديث البيانات عند التبديل
-        renderData();
-    };
-
-    // جلب الفئات وتحديث القائمة المنسدلة وجدول الأقسام
-    async function loadCategories() {
-        const snap = await getDocs(collection(db, "categories"));
-        const cats = [];
-        snap.forEach(d => cats.push({ id: d.id, ...d.data() }));
-        return cats;
-    }
-
-    async function populateCategorySelect() {
-        const select = document.getElementById('pCat');
-        const cats = await loadCategories();
-        select.innerHTML = '';
-        if (cats.length === 0) {
-            select.innerHTML = '<option value="">لا توجد أقسام، أضف قسم أولاً</option>';
-        } else {
-            cats.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.name;
-                select.appendChild(opt);
-            });
-        }
-        // إذا كان هناك منتج قيد التعديل، حدد الفئة الخاصة به
-        if (editingProductId) {
-            // سيتم ضبطه لاحقاً عند ملء النموذج
-        }
-    }
-
-    // عرض المنتجات
-    async function renderProducts() {
-        const tbody = document.getElementById('pTable');
-        tbody.innerHTML = '';
-        const snap = await getDocs(collection(db, "products"));
-        const catsMap = {};
-        (await loadCategories()).forEach(c => catsMap[c.id] = c.name);
-
-        snap.forEach(doc => {
-            const p = doc.data();
-            const catName = catsMap[p.category] || 'بدون قسم';
-            tbody.innerHTML += `
-                <tr>
-                    <td>${p.name}</td>
-                    <td>${catName}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-2" onclick="editProduct('${doc.id}')"><i class="bi bi-pencil-square"></i> تعديل</button>
-                        <button class="btn btn-sm btn-danger" onclick="delP('${doc.id}')"><i class="bi bi-trash"></i> حذف</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    // عرض الطلبات
-    async function renderOrders() {
-        const tbody = document.getElementById('oTable');
-        tbody.innerHTML = '';
-        const snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
-        snap.forEach(doc => {
-            const o = doc.data();
-            const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير معروف';
-            const status = o.status || 'pending';
-            const statusBadge = {
-                'pending': 'badge-pending',
-                'completed': 'badge-completed',
-                'cancelled': 'badge-cancelled'
-            }[status] || 'badge-pending';
-            const statusText = {
-                'pending': 'قيد المعالجة',
-                'completed': 'مكتمل',
-                'cancelled': 'ملغي'
-            }[status] || 'قيد المعالجة';
-
-            tbody.innerHTML += `
-                <tr>
-                    <td>${o.productName || 'غير معروف'}</td>
-                    <td>${o.customerName || o.userData || ''}</td>
-                    <td>${o.customerEmail || ''}</td>
-                    <td>${o.customerPhone || ''}</td>
-                    <td>${o.orderDetails || ''}</td>
-                    <td>${date}</td>
-                    <td>
-                        <select class="form-select form-select-sm status-select" data-orderid="${doc.id}" style="min-width:120px;">
-                            <option value="pending" ${status==='pending'?'selected':''}>قيد المعالجة</option>
-                            <option value="completed" ${status==='completed'?'selected':''}>مكتمل</option>
-                            <option value="cancelled" ${status==='cancelled'?'selected':''}>ملغي</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" onclick="delO('${doc.id}')"><i class="bi bi-x-lg"></i> مسح</button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        // إضافة حدث تغيير الحالة
-        document.querySelectorAll('.status-select').forEach(sel => {
-            sel.addEventListener('change', async (e) => {
-                const id = sel.dataset.orderid;
-                const newStatus = sel.value;
-                await updateDoc(doc(db, "orders", id), { status: newStatus });
-                renderOrders();
-            });
-        });
-    }
-
-    // عرض الأقسام
-    async function renderCategories() {
-        const tbody = document.getElementById('cTable');
-        tbody.innerHTML = '';
-        const cats = await loadCategories();
-        cats.forEach((c, idx) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${idx+1}</td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm cat-name-input" data-catid="${c.id}" value="${c.name}" style="background:#1a0033!important; max-width:300px;">
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-2 update-cat-btn" data-catid="${c.id}"><i class="bi bi-check-lg"></i> تحديث</button>
-                        <button class="btn btn-sm btn-danger" onclick="delC('${c.id}')"><i class="bi bi-trash"></i> حذف</button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        // أحداث تحديث الأقسام
-        document.querySelectorAll('.update-cat-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = btn.dataset.catid;
-                const input = document.querySelector(`.cat-name-input[data-catid="${id}"]`);
-                const newName = input.value.trim();
-                if (!newName) return alert('الاسم لا يمكن أن يكون فارغاً');
-                await updateDoc(doc(db, "categories", id), { name: newName });
-                renderData();
-            });
-        });
-    }
-
-    // دالة شاملة لتحديث كل البيانات
-    async function renderData() {
-        await populateCategorySelect();
-        await renderProducts();
-        await renderOrders();
-        await renderCategories();
-    }
-
-    // --- دوال المنتجات ---
-    window.delP = async (id) => {
-        if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-        await deleteDoc(doc(db, "products", id));
-        renderData();
-    };
-
-    window.editProduct = async (id) => {
-        const docSnap = await getDocs(collection(db, "products"));
-        let product = null;
-        docSnap.forEach(d => {
-            if (d.id === id) {
-                product = { id: d.id, ...d.data() };
-            }
-        });
-        if (!product) return alert('المنتج غير موجود');
-
-        editingProductId = id;
-        document.getElementById('formTitle').textContent = 'تعديل المنتج';
-        document.getElementById('addBtn').innerHTML = '<i class="bi bi-arrow-repeat"></i> تحديث المنتج';
-
-        document.getElementById('pName').value = product.name || '';
-        document.getElementById('pPrompt').value = product.inputPrompt || '';
-        // تحديد الفئة في القائمة المنسدلة
-        const select = document.getElementById('pCat');
-        if (product.category) {
-            select.value = product.category;
-        }
-
-        // ملء الباقات
-        const container = document.getElementById('packagesContainer');
-        container.innerHTML = '';
-        if (product.packages && Array.isArray(product.packages)) {
-            product.packages.forEach(pkg => {
-                const row = document.createElement('div');
-                row.className = 'package-row row g-2 align-items-center';
-                row.innerHTML = `
-                    <div class="col-6"><input type="text" class="form-control pkg-name" value="${pkg.name || ''}" placeholder="الكمية"></div>
-                    <div class="col-4"><input type="text" class="form-control pkg-price" value="${pkg.price || ''}" placeholder="السعر"></div>
-                    <div class="col-2"><button class="btn btn-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-x"></i></button></div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        // تغيير صورة المنتج - لا نستطيع جلب الصورة من الملف، سنتركها فارغة ونستخدم القديمة إذا لم يتم تغييرها
-        // لكننا سنقوم برفع صورة جديدة إذا تم اختيار ملف
-        document.getElementById('pImage').value = ''; // إعادة تعيين حقل الملف
-
-        // التمرير إلى الأعلى
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    // --- دوال الأقسام ---
-    window.delC = async (id) => {
-        if (!confirm('حذف هذا القسم سيؤثر على المنتجات المرتبطة به. هل أنت متأكد؟')) return;
-        await deleteDoc(doc(db, "categories", id));
-        renderData();
-    };
-
-    document.getElementById('addCategoryBtn').addEventListener('click', async () => {
-        const name = document.getElementById('newCategoryName').value.trim();
-        if (!name) return alert('الرجاء إدخال اسم القسم');
-        await setDoc(doc(db, "categories", Date.now().toString()), { name });
-        document.getElementById('newCategoryName').value = '';
-        renderData();
-    });
-
-    // --- إضافة باقة جديدة ---
-    document.getElementById('addPackageBtn').addEventListener('click', () => {
-        const row = document.createElement('div');
-        row.className = 'package-row row g-2 align-items-center';
-        row.innerHTML = `
-            <div class="col-6"><input type="text" class="form-control pkg-name" placeholder="الكمية (مثل: 1000 متابع)"></div>
-            <div class="col-4"><input type="text" class="form-control pkg-price" placeholder="السعر (مثل: 5$ أو 150 ج.م)"></div>
-            <div class="col-2"><button class="btn btn-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-x"></i></button></div>
-        `;
-        document.getElementById('packagesContainer').appendChild(row);
-    });
-
-    // --- حفظ / تحديث المنتج ---
-    document.getElementById('addBtn').addEventListener('click', async () => {
-        const name = document.getElementById('pName').value.trim();
-        const prompt = document.getElementById('pPrompt').value.trim();
-        const category = document.getElementById('pCat').value;
-        const file = document.getElementById('pImage').files[0];
-
-        if (!name) return alert('الرجاء إدخال اسم المنتج');
-        if (!category) return alert('الرجاء اختيار قسم');
-
-        // جمع الباقات
-        const packages = [];
-        document.querySelectorAll('.package-row').forEach(row => {
-            const pkgName = row.querySelector('.pkg-name').value.trim();
-            const pkgPrice = row.querySelector('.pkg-price').value.trim();
-            if (pkgName && pkgPrice) {
-                packages.push({ name: pkgName, price: pkgPrice });
-            }
-        });
-
-        let imageUrl = null;
-        if (file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
-                method: 'POST',
-                body: formData
-            });
-            const imgData = await res.json();
-            if (imgData.success) {
-                imageUrl = imgData.data.url;
-            } else {
-                alert('فشل رفع الصورة، حاول مرة أخرى');
-                return;
-            }
-        }
-
-        const productData = {
-            name,
-            inputPrompt: prompt,
-            category,
-            packages,
-            // إذا كانت الصورة موجودة نقوم بتحديثها، وإلا نبقي القديمة (في حالة التعديل)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAEKNtK6UVtLySjxp5IlXL7es8bC8M9w-Y",
+          authDomain: "yasser-store-7e736.firebaseapp.com",
+          projectId: "yasser-store-7e736",
+          storageBucket: "yasser-store-7e736.firebasestorage.app",
+          messagingSenderId: "363907199851",
+          appId: "1:363907199851:web:f36f479fa91b53823c922e"
         };
 
-        if (imageUrl) {
-            productData.image = imageUrl;
-        }
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth();
 
-        try {
-            if (editingProductId) {
-                // تحديث
-                await updateDoc(doc(db, "products", editingProductId), productData);
-                alert('تم تحديث المنتج بنجاح!');
-            } else {
-                // إضافة جديدة
-                await setDoc(doc(db, "products", Date.now().toString()), productData);
-                alert('تم إضافة المنتج بنجاح!');
-            }
-        } catch (err) {
-            alert('حدث خطأ: ' + err.message);
-        }
+        let editingProductId = null; // لتخزين معرف المنتج الجاري تعديله
 
-        // إعادة تعيين النموذج
-        editingProductId = null;
-        document.getElementById('formTitle').textContent = 'إضافة منتج جديد';
-        document.getElementById('addBtn').innerHTML = '<i class="bi bi-save"></i> حفظ المنتج';
-        document.getElementById('pName').value = '';
-        document.getElementById('pPrompt').value = '';
-        document.getElementById('pImage').value = '';
-        document.getElementById('packagesContainer').innerHTML = '';
-        // إضافة باقة افتراضية واحدة لتسهيل الإدخال
-        document.getElementById('addPackageBtn').click();
+        // دوال التبويبات
+        window.switchTab = (tab) => {
+            document.getElementById('addSection').classList.toggle('d-none', tab !== 'add');
+            document.getElementById('ordersSection').classList.toggle('d-none', tab !== 'orders');
+            document.getElementById('categoriesSection').classList.toggle('d-none', tab !== 'categories');
 
-        renderData();
-    });
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            if (tab === 'add') document.getElementById('tabAdd').classList.add('active');
+            else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
+            else if (tab === 'categories') document.getElementById('tabCategories').classList.add('active');
 
-    // --- دوال الطلبات ---
-    window.delO = async (id) => {
-        if (!confirm('مسح هذا الطلب؟')) return;
-        await deleteDoc(doc(db, "orders", id));
-        renderData();
-    };
-
-    // --- التحقق من الأدمن ---
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === "yasserramadanhoms@gmail.com") {
-            document.getElementById('authStatus').classList.add('d-none');
-            document.getElementById('adminPanel').classList.remove('d-none');
-            // إضافة باقة افتراضية عند التحميل
-            document.getElementById('addPackageBtn').click();
+            // تحديث البيانات عند التبديل
             renderData();
-        } else {
-            document.getElementById('authStatus').innerHTML = '⚠️ غير مصرح لك بالدخول. حساب الأدمن فقط.';
-        }
-    });
+        };
 
-</script>
+        // جلب الفئات وتحديث القائمة المنسدلة وجدول الأقسام
+        async function loadCategories() {
+            const snap = await getDocs(collection(db, "categories"));
+            const cats = [];
+            snap.forEach(d => cats.push({ id: d.id, ...d.data() }));
+            return cats;
+        }
+
+        async function populateCategorySelect() {
+            const select = document.getElementById('pCat');
+            const cats = await loadCategories();
+            select.innerHTML = '';
+            if (cats.length === 0) {
+                select.innerHTML = '<option value="">لا توجد أقسام، أضف قسم أولاً</option>';
+            } else {
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            }
+            // إذا كان هناك منتج قيد التعديل، حدد الفئة الخاصة به
+            if (editingProductId) {
+                // سيتم ضبطه لاحقاً عند ملء النموذج
+            }
+        }
+
+        // عرض المنتجات
+        async function renderProducts() {
+            const tbody = document.getElementById('pTable');
+            tbody.innerHTML = '';
+            const snap = await getDocs(collection(db, "products"));
+            const catsMap = {};
+            (await loadCategories()).forEach(c => catsMap[c.id] = c.name);
+
+            snap.forEach(doc => {
+                const p = doc.data();
+                const catName = catsMap[p.category] || 'بدون قسم';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.name}</td>
+                        <td>${catName}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2" onclick="editProduct('${doc.id}')"><i class="bi bi-pencil-square"></i> تعديل</button>
+                            <button class="btn btn-sm btn-danger" onclick="delP('${doc.id}')"><i class="bi bi-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // عرض الطلبات
+        async function renderOrders() {
+            const tbody = document.getElementById('oTable');
+            tbody.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
+            snap.forEach(doc => {
+                const o = doc.data();
+                const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير معروف';
+                const status = o.status || 'pending';
+                const statusBadge = {
+                    'pending': 'badge-pending',
+                    'completed': 'badge-completed',
+                    'cancelled': 'badge-cancelled'
+                }[status] || 'badge-pending';
+                const statusText = {
+                    'pending': 'قيد المعالجة',
+                    'completed': 'مكتمل',
+                    'cancelled': 'ملغي'
+                }[status] || 'قيد المعالجة';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${o.productName || 'غير معروف'}</td>
+                        <td>${o.customerName || o.userData || ''}</td>
+                        <td>${o.customerEmail || ''}</td>
+                        <td>${o.customerPhone || ''}</td>
+                        <td>${o.orderDetails || ''}</td>
+                        <td>${date}</td>
+                        <td>
+                            <select class="form-select form-select-sm status-select" data-orderid="${doc.id}" style="min-width:140px;">
+                                <option value="pending" ${status==='pending'?'selected':''}>قيد المعالجة</option>
+                                <option value="completed" ${status==='completed'?'selected':''}>مكتمل</option>
+                                <option value="cancelled" ${status==='cancelled'?'selected':''}>ملغي</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="delO('${doc.id}')"><i class="bi bi-x-lg"></i> مسح</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // إضافة حدث تغيير الحالة
+            document.querySelectorAll('.status-select').forEach(sel => {
+                sel.addEventListener('change', async (e) => {
+                    const id = sel.dataset.orderid;
+                    const newStatus = sel.value;
+                    await updateDoc(doc(db, "orders", id), { status: newStatus });
+                    renderOrders();
+                });
+            });
+        }
+
+        // عرض الأقسام
+        async function renderCategories() {
+            const tbody = document.getElementById('cTable');
+            tbody.innerHTML = '';
+            const cats = await loadCategories();
+            cats.forEach((c, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx+1}</td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm cat-name-input" data-catid="${c.id}" value="${c.name}" style="background:#1a0033!important; max-width:300px;">
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2 update-cat-btn" data-catid="${c.id}"><i class="bi bi-check-lg"></i> تحديث</button>
+                            <button class="btn btn-sm btn-danger" onclick="delC('${c.id}')"><i class="bi bi-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // أحداث تحديث الأقسام
+            document.querySelectorAll('.update-cat-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = btn.dataset.catid;
+                    const input = document.querySelector(`.cat-name-input[data-catid="${id}"]`);
+                    const newName = input.value.trim();
+                    if (!newName) return alert('الاسم لا يمكن أن يكون فارغاً');
+                    await updateDoc(doc(db, "categories", id), { name: newName });
+                    renderData();
+                });
+            });
+        }
+
+        // دالة شاملة لتحديث كل البيانات
+        async function renderData() {
+            await populateCategorySelect();
+            await renderProducts();
+            await renderOrders();
+            await renderCategories();
+        }
+
+        // --- دوال المنتجات ---
+        window.delP = async (id) => {
+            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+            await deleteDoc(doc(db, "products", id));
+            renderData();
+        };
+
+        window.editProduct = async (id) => {
+            const docSnap = await getDocs(collection(db, "products"));
+            let product = null;
+            docSnap.forEach(d => {
+                if (d.id === id) {
+                    product = { id: d.id, ...d.data() };
+                }
+            });
+            if (!product) return alert('المنتج غير موجود');
+
+            editingProductId = id;
+            document.getElementById('formTitle').textContent = 'تعديل المنتج';
+            document.getElementById('addBtn').innerHTML = '<i class="bi bi-arrow-repeat"></i> تحديث المنتج';
+
+            document.getElementById('pName').value = product.name || '';
+            document.getElementById('pPrompt').value = product.inputPrompt || '';
+            // تحديد الفئة في القائمة المنسدلة
+            const select = document.getElementById('pCat');
+            if (product.category) {
+                select.value = product.category;
+            }
+
+            // ملء الباقات
+            const container = document.getElementById('packagesContainer');
+            container.innerHTML = '';
+            if (product.packages && Array.isArray(product.packages)) {
+                product.packages.forEach(pkg => {
+                    const row = document.createElement('div');
+                    row.className = 'package-row row g-2 align-items-center';
+                    row.innerHTML = `
+                        <div class="col-6"><input type="text" class="form-control pkg-name" value="${pkg.name || ''}" placeholder="الكمية"></div>
+                        <div class="col-4"><input type="text" class="form-control pkg-price" value="${pkg.price || ''}" placeholder="السعر"></div>
+                        <div class="col-2"><button class="btn btn-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-x"></i></button></div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            // تغيير صورة المنتج - نتركها فارغة
+            document.getElementById('pImage').value = '';
+
+            // التمرير إلى الأعلى
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // --- دوال الأقسام ---
+        window.delC = async (id) => {
+            if (!confirm('حذف هذا القسم سيؤثر على المنتجات المرتبطة به. هل أنت متأكد؟')) return;
+            await deleteDoc(doc(db, "categories", id));
+            renderData();
+        };
+
+        document.getElementById('addCategoryBtn').addEventListener('click', async () => {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (!name) return alert('الرجاء إدخال اسم القسم');
+            await setDoc(doc(db, "categories", Date.now().toString()), { name });
+            document.getElementById('newCategoryName').value = '';
+            renderData();
+        });
+
+        // --- إضافة باقة جديدة ---
+        document.getElementById('addPackageBtn').addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'package-row row g-2 align-items-center';
+            row.innerHTML = `
+                <div class="col-6"><input type="text" class="form-control pkg-name" placeholder="الكمية (مثل: 1000 متابع)"></div>
+                <div class="col-4"><input type="text" class="form-control pkg-price" placeholder="السعر (مثل: 5$ أو 150 ج.م)"></div>
+                <div class="col-2"><button class="btn btn-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-x"></i></button></div>
+            `;
+            document.getElementById('packagesContainer').appendChild(row);
+        });
+
+        // --- حفظ / تحديث المنتج ---
+        document.getElementById('addBtn').addEventListener('click', async () => {
+            const name = document.getElementById('pName').value.trim();
+            const prompt = document.getElementById('pPrompt').value.trim();
+            const category = document.getElementById('pCat').value;
+            const file = document.getElementById('pImage').files[0];
+
+            if (!name) return alert('الرجاء إدخال اسم المنتج');
+            if (!category) return alert('الرجاء اختيار قسم');
+
+            // جمع الباقات
+            const packages = [];
+            document.querySelectorAll('.package-row').forEach(row => {
+                const pkgName = row.querySelector('.pkg-name').value.trim();
+                const pkgPrice = row.querySelector('.pkg-price').value.trim();
+                if (pkgName && pkgPrice) {
+                    packages.push({ name: pkgName, price: pkgPrice });
+                }
+            });
+
+            let imageUrl = null;
+            if (file) {
+                const formData = new FormData();
+                formData.append('image', file);
+                const res = await fetch('https://api.imgbb.com/1/upload?key=d4153c26566671cd622f560fa7986321', {
+                    method: 'POST',
+                    body: formData
+                });
+                const imgData = await res.json();
+                if (imgData.success) {
+                    imageUrl = imgData.data.url;
+                } else {
+                    alert('فشل رفع الصورة، حاول مرة أخرى');
+                    return;
+                }
+            }
+
+            const productData = {
+                name,
+                inputPrompt: prompt,
+                category,
+                packages,
+            };
+
+            if (imageUrl) {
+                productData.image = imageUrl;
+            }
+
+            try {
+                if (editingProductId) {
+                    // تحديث
+                    await updateDoc(doc(db, "products", editingProductId), productData);
+                    alert('تم تحديث المنتج بنجاح!');
+                } else {
+                    // إضافة جديدة
+                    await setDoc(doc(db, "products", Date.now().toString()), productData);
+                    alert('تم إضافة المنتج بنجاح!');
+                }
+            } catch (err) {
+                alert('حدث خطأ: ' + err.message);
+            }
+
+            // إعادة تعيين النموذج
+            editingProductId = null;
+            document.getElementById('formTitle').textContent = 'إضافة منتج جديد';
+            document.getElementById('addBtn').innerHTML = '<i class="bi bi-save"></i> حفظ المنتج';
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrompt').value = '';
+            document.getElementById('pImage').value = '';
+            document.getElementById('packagesContainer').innerHTML = '';
+            // إضافة باقة افتراضية
+            document.getElementById('addPackageBtn').click();
+
+            renderData();
+        });
+
+        // --- دوال الطلبات ---
+        window.delO = async (id) => {
+            if (!confirm('مسح هذا الطلب؟')) return;
+            await deleteDoc(doc(db, "orders", id));
+            renderData();
+        };
+
+        // --- التحقق من الأدمن ---
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === "yasserramadanhoms@gmail.com") {
+                document.getElementById('authStatus').classList.add('d-none');
+                document.getElementById('adminPanel').classList.remove('d-none');
+                // إضافة باقة افتراضية عند التحميل
+                document.getElementById('addPackageBtn').click();
+                renderData();
+            } else {
+                document.getElementById('authStatus').innerHTML = '⚠️ غير مصرح لك بالدخول. حساب الأدمن فقط.';
+            }
+        });
+
+    </script>
 </body>
 </html>
