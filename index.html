@@ -131,6 +131,11 @@
             transition: 0.3s;
             margin-bottom: 5px;
             font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: right;
         }
         .sidebar .nav-link-custom:hover {
             background: #26004d;
@@ -341,6 +346,60 @@
         .section-title h4 { color: #fff; font-weight: bold; margin: 0; }
         .text-muted-custom { color: #888; }
 
+        /* ===== نافذة طرق الدفع (Modal) ===== */
+        .payment-modal .modal-content {
+            background: linear-gradient(145deg, #1a0033, #26004d);
+            border: 2px solid #7c4dff;
+            border-radius: 25px;
+            color: #fff;
+            padding: 20px;
+        }
+        .payment-modal .modal-header {
+            border-bottom: 1px solid #4d0099;
+            padding-bottom: 15px;
+        }
+        .payment-modal .modal-header .modal-title {
+            font-weight: bold;
+            color: #b388ff;
+        }
+        .payment-modal .modal-header .btn-close {
+            filter: invert(1);
+        }
+        .payment-modal .modal-body {
+            padding: 25px 15px;
+            text-align: center;
+        }
+        .payment-modal .modal-body i {
+            font-size: 3.5rem;
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+        .payment-modal .modal-body p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #e0d6f5;
+        }
+        .payment-modal .modal-body .highlight {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .payment-modal .modal-footer {
+            border-top: 1px solid #4d0099;
+            justify-content: center;
+            padding-top: 15px;
+        }
+        .payment-modal .btn-close-modal {
+            background: #7c4dff;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 30px;
+            font-weight: bold;
+        }
+        .payment-modal .btn-close-modal:hover {
+            background: #651fff;
+        }
+
         /* ===== استجابة ===== */
         @media (max-width: 768px) {
             .sidebar { width: 280px; right: -290px; }
@@ -401,6 +460,11 @@
                 <button id="sendNoteBtn" class="btn btn-custom btn-sm w-100 mt-1"><i class="bi bi-send"></i> إرسال</button>
             </div>
 
+            <!-- ===== طرق الدفع (جديد) ===== -->
+            <button class="nav-link-custom" id="paymentBtn" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                <i class="bi bi-credit-card-2-front"></i> طرق الدفع
+            </button>
+
             <a href="https://chat.whatsapp.com/HYuy1uJTM4rFzPTGZD8DWU" target="_blank" class="nav-link-custom"><i class="bi bi-whatsapp" style="color:#25d366;"></i> انضم للمجتمع</a>
             <a href="https://wa.me/963997160904" target="_blank" class="nav-link-custom"><i class="bi bi-headset" style="color:#25d366;"></i> الدعم الفني</a>
 
@@ -415,6 +479,34 @@
                     <span class="star" data-value="5">★</span>
                 </div>
                 <div id="ratingFeedback" class="text-center small text-muted-custom mt-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== نافذة طرق الدفع (Modal) ===== -->
+    <div class="modal fade payment-modal" id="paymentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-credit-card-2-front"></i> طرق الدفع</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <i class="bi bi-shield-check"></i>
+                    <p>
+                        طريقة الدفع المعتمدة حالياً هي عن طريق تطبيق <span class="highlight">شام كاش</span> <br>
+                        بالعملتين <span class="highlight">الدولار الأمريكي</span> أو <span class="highlight">الليرة السورية</span> بحسب سعر الصرف.
+                        <br><br>
+                        كما أن الدفع وجميع المنتجات يتم تسليمها مباشرة عبر <span class="highlight">الواتساب</span>.
+                        <br><br>
+                        شكراً لثقتكم بنا
+                        <br>
+                        <span class="text-muted">إدارة المتجر</span>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-close-modal" data-bs-dismiss="modal">حسناً</button>
+                </div>
             </div>
         </div>
     </div>
@@ -437,7 +529,7 @@
 
         <div id="mainContent">
 
-            <!-- ===== السلايدر (بدون أسماء) ===== -->
+            <!-- ===== السلايدر ===== -->
             <div class="slider-section">
                 <div id="productSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
                     <div class="carousel-indicators" id="sliderIndicators"></div>
@@ -457,7 +549,7 @@
                 </div>
             </div>
 
-            <!-- ===== الأقسام الرئيسية (كروت مستطيلة) ===== -->
+            <!-- ===== الأقسام الرئيسية ===== -->
             <div class="categories-section">
                 <div class="section-title">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -551,7 +643,7 @@
             location.reload();
         });
 
-        // ===== السلايدر (بدون أسماء) =====
+        // ===== السلايدر =====
         async function loadSlider() {
             try {
                 const q = query(collection(db, "products"), orderBy("name"), limit(10));
@@ -588,7 +680,6 @@
                 inner.innerHTML = items;
                 indicators.innerHTML = indicatorsHtml;
 
-                // إعادة تشغيل السلايدر
                 const sliderEl = document.getElementById('productSlider');
                 const bsSlider = bootstrap.Carousel.getInstance(sliderEl);
                 if (bsSlider) bsSlider.dispose();
@@ -603,7 +694,7 @@
             }
         }
 
-        // ===== إرسال الملاحظة (نفس الكود السابق) =====
+        // ===== إرسال الملاحظة =====
         document.getElementById('sendNoteBtn').addEventListener('click', async () => {
             const note = document.getElementById('noteInput').value.trim();
             if (!note) return alert('الرجاء كتابة ملاحظة أولاً!');
