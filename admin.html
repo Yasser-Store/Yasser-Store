@@ -50,6 +50,7 @@
         .btn-back:hover { background: #6a00cc; }
         .category-badge { background: #4d0099; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem; color: #fff; }
         .status-select { min-width: 140px; background-color: #1f0040 !important; color: #fff !important; border: 1px solid #7b1fa2 !important; border-radius: 12px !important; padding: 6px 12px !important; }
+        textarea.form-control { min-height: 150px; }
     </style>
 </head>
 <body>
@@ -73,6 +74,7 @@
                 <li class="nav-item"><a class="nav-link active" id="tabAdd" onclick="switchTab('add')"><i class="bi bi-plus-circle"></i> إضافة منتج</a></li>
                 <li class="nav-item"><a class="nav-link" id="tabOrders" onclick="switchTab('orders')"><i class="bi bi-list-ul"></i> الطلبات</a></li>
                 <li class="nav-item"><a class="nav-link" id="tabUsers" onclick="switchTab('users')"><i class="bi bi-people"></i> المستخدمون</a></li>
+                <li class="nav-item"><a class="nav-link" id="tabSettings" onclick="switchTab('settings')"><i class="bi bi-gear"></i> الإعدادات</a></li>
             </ul>
 
             <!-- ===== قسم إضافة المنتجات ===== -->
@@ -127,7 +129,7 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المستخدمين (جديد) ===== -->
+            <!-- ===== قسم المستخدمين ===== -->
             <div id="usersSection" class="d-none">
                 <div class="card">
                     <div class="section-title"><i class="bi bi-people"></i><h3>جميع المستخدمين المسجلين</h3></div>
@@ -146,6 +148,17 @@
                             <tbody id="usersTable"><tr><td colspan="6" class="text-center text-muted">جاري تحميل المستخدمين...</td></tr></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- ===== قسم الإعدادات (شريط الأخبار) ===== -->
+            <div id="settingsSection" class="d-none">
+                <div class="card">
+                    <div class="section-title"><i class="bi bi-newspaper"></i><h3>التحكم بشريط الأخبار</h3></div>
+                    <p class="text-muted">اكتب النصوص التي تريد ظهورها في شريط الأخبار المتحرك، كل جملة في سطر منفصل.</p>
+                    <textarea id="newsTextarea" class="form-control" rows="6" placeholder="أدخل جمل الأخبار هنا، كل جملة في سطر منفصل..."></textarea>
+                    <button id="saveNewsBtn" class="btn btn-primary w-100 mt-3"><i class="bi bi-save"></i> حفظ التغييرات</button>
+                    <div id="newsSaveStatus" class="mt-2 text-center"></div>
                 </div>
             </div>
 
@@ -178,14 +191,17 @@
             document.getElementById('addSection').classList.toggle('d-none', tab !== 'add');
             document.getElementById('ordersSection').classList.toggle('d-none', tab !== 'orders');
             document.getElementById('usersSection').classList.toggle('d-none', tab !== 'users');
+            document.getElementById('settingsSection').classList.toggle('d-none', tab !== 'settings');
 
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             if (tab === 'add') document.getElementById('tabAdd').classList.add('active');
             else if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
             else if (tab === 'users') document.getElementById('tabUsers').classList.add('active');
+            else if (tab === 'settings') document.getElementById('tabSettings').classList.add('active');
 
             if (tab === 'orders') renderOrders();
             if (tab === 'users') renderUsers();
+            if (tab === 'settings') loadNewsSettings();
         };
 
         // ---------- المنتجات (نفس الكود السابق) ----------
@@ -306,7 +322,7 @@
             renderProducts();
         });
 
-        // ---------- الطلبات (نفس الكود السابق) ----------
+        // ---------- الطلبات ----------
         async function renderOrders() {
             const tbody = document.getElementById('ordersTable');
             tbody.innerHTML = '<tr><td colspan="9" class="text-center text-secondary">جاري التحميل...</td></tr>';
@@ -368,7 +384,7 @@
             renderOrders();
         };
 
-        // ---------- المستخدمون (جديد مع الحظر) ----------
+        // ---------- المستخدمون ----------
         async function renderUsers() {
             const tbody = document.getElementById('usersTable');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary">جاري التحميل...</td></tr>';
@@ -405,19 +421,51 @@
             }
         }
 
-        // دالة الحظر/فك الحظر
         window.toggleBan = async (userId, banStatus) => {
             const action = banStatus ? 'حظر' : 'فك الحظر';
             if (!confirm(`هل أنت متأكد من ${action} هذا المستخدم؟`)) return;
             try {
                 await updateDoc(doc(db, "users", userId), { isBanned: banStatus });
                 alert(`تم ${action} المستخدم بنجاح!`);
-                renderUsers(); // تحديث الجدول
+                renderUsers();
             } catch (e) {
                 alert(`خطأ في ${action} المستخدم: ${e.message}`);
                 console.error(e);
             }
         };
+
+        // ---------- شريط الأخبار (الإعدادات) ----------
+        async function loadNewsSettings() {
+            try {
+                const docRef = doc(db, "settings", "news");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const items = data.items || [];
+                    document.getElementById('newsTextarea').value = items.join('\n');
+                } else {
+                    document.getElementById('newsTextarea').value = '';
+                }
+            } catch (e) {
+                console.error("خطأ في تحميل الإعدادات:", e);
+            }
+        }
+
+        document.getElementById('saveNewsBtn').addEventListener('click', async () => {
+            const text = document.getElementById('newsTextarea').value;
+            const items = text.split('\n').filter(line => line.trim() !== '');
+            if (items.length === 0) {
+                document.getElementById('newsSaveStatus').innerHTML = '<span class="text-warning">⚠️ الرجاء إدخال نص واحد على الأقل.</span>';
+                return;
+            }
+            try {
+                await setDoc(doc(db, "settings", "news"), { items: items });
+                document.getElementById('newsSaveStatus').innerHTML = '<span class="text-success">✅ تم حفظ النصوص بنجاح!</span>';
+                setTimeout(() => { document.getElementById('newsSaveStatus').innerHTML = ''; }, 3000);
+            } catch (e) {
+                document.getElementById('newsSaveStatus').innerHTML = `<span class="text-danger">❌ خطأ: ${e.message}</span>`;
+            }
+        });
 
         // ---------- التحقق من الأدمن ----------
         onAuthStateChanged(auth, (user) => {
@@ -426,7 +474,6 @@
                 document.getElementById('adminPanel').classList.remove('d-none');
                 document.getElementById('addPackageBtn').click();
                 renderProducts();
-                // تحميل البيانات عند التبديل للتبويبات
             } else {
                 document.getElementById('authStatus').innerHTML = '⚠️ غير مصرح لك بالدخول. حساب الأدمن فقط.';
             }
