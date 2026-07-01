@@ -207,7 +207,7 @@
             background: #7c4dff;
         }
 
-        /* ===== شريط الأخبار المتحرك - الإصلاح ===== */
+        /* ===== شريط الأخبار المتحرك (نسخة جديدة) ===== */
         .news-ticker {
             background: #1a0033;
             border: 1px solid #4d0099;
@@ -218,13 +218,13 @@
             position: relative;
             box-shadow: 0 4px 15px rgba(128, 0, 255, 0.2);
         }
-        .news-ticker .ticker-content {
+        .news-ticker .ticker-track {
             display: flex;
             align-items: center;
             width: max-content;
-            animation: ticker-scroll 20s linear infinite;
+            animation: ticker-scroll 25s linear infinite;
         }
-        .news-ticker .ticker-content span {
+        .news-ticker .ticker-track span {
             color: #fff;
             font-size: 1.1rem;
             font-weight: 500;
@@ -233,7 +233,7 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
-        .news-ticker .ticker-content i {
+        .news-ticker .ticker-track i {
             color: #ffc107;
             font-size: 1.2rem;
             margin-left: 10px;
@@ -258,7 +258,7 @@
         }
 
         @keyframes ticker-scroll {
-            0% { transform: translateX(0%); }
+            0% { transform: translateX(0); }
             100% { transform: translateX(-33.33%); }
         }
 
@@ -460,7 +460,7 @@
             .sidebar { width: 280px; right: -290px; }
             .slider-container img { height: 220px; }
             .sidebar-logo img { width: 60px; height: 60px; }
-            .news-ticker .ticker-content span { font-size: 0.9rem; padding: 0 15px; }
+            .news-ticker .ticker-track span { font-size: 0.9rem; padding: 0 15px; }
             .news-ticker .ticker-icon { font-size: 0.7rem; padding: 3px 10px; right: 5px; }
         }
     </style>
@@ -518,7 +518,7 @@
                 <button id="sendNoteBtn" class="btn btn-custom btn-sm w-100 mt-1"><i class="bi bi-send"></i> إرسال</button>
             </div>
 
-            <!-- ===== طرق الدفع (جديد) ===== -->
+            <!-- ===== طرق الدفع ===== -->
             <button class="nav-link-custom" id="paymentBtn" data-bs-toggle="modal" data-bs-target="#paymentModal">
                 <i class="bi bi-credit-card-2-front"></i> طرق الدفع
             </button>
@@ -607,11 +607,10 @@
                 </div>
             </div>
 
-            <!-- ===== شريط الأخبار المتحرك (ديناميكي من Firebase) ===== -->
+            <!-- ===== شريط الأخبار (جديد) ===== -->
             <div class="news-ticker">
                 <div class="ticker-icon"><i class="bi bi-megaphone"></i> أخبار</div>
-                <div class="ticker-content" id="tickerContent">
-                    <!-- سيتم ملؤه بواسطة JavaScript -->
+                <div class="ticker-track" id="tickerTrack">
                     <span><i class="bi bi-star-fill"></i> جاري تحميل الأخبار...</span>
                 </div>
             </div>
@@ -712,7 +711,7 @@
 
         // ===== دالة تحميل شريط الأخبار من Firebase =====
         async function loadTicker() {
-            const container = document.getElementById('tickerContent');
+            const track = document.getElementById('tickerTrack');
             try {
                 const docRef = doc(db, "settings", "ticker");
                 const docSnap = await getDoc(docRef);
@@ -739,7 +738,7 @@
                         html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
                     });
                 }
-                container.innerHTML = html;
+                track.innerHTML = html;
 
             } catch (e) {
                 console.error("خطأ في تحميل شريط الأخبار:", e);
@@ -758,7 +757,7 @@
                         html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
                     });
                 }
-                container.innerHTML = html;
+                track.innerHTML = html;
             }
         }
 
