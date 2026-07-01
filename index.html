@@ -222,7 +222,7 @@
             display: flex;
             align-items: center;
             white-space: nowrap;
-            animation: ticker-scroll 25s linear infinite;
+            animation: ticker-scroll 10s linear infinite;
         }
         .news-ticker .ticker-content span {
             color: #fff;
@@ -257,8 +257,8 @@
         }
 
         @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% { transform: translateX(-50); }
+            100% { transform: translateX(0%); }
         }
 
         /* ===== الأقسام الرئيسية (كروت مستطيلة) ===== */
