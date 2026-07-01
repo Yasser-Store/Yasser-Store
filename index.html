@@ -207,7 +207,7 @@
             background: #7c4dff;
         }
 
-        /* ===== شريط الأخبار المتحرك ===== */
+        /* ===== شريط الأخبار المتحرك - الإصلاح ===== */
         .news-ticker {
             background: #1a0033;
             border: 1px solid #4d0099;
@@ -219,9 +219,10 @@
             box-shadow: 0 4px 15px rgba(128, 0, 255, 0.2);
         }
         .news-ticker .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            animation: ticker-scroll 8s linear infinite;
+            display: flex;
+            align-items: center;
+            width: max-content;
+            animation: ticker-scroll 20s linear infinite;
         }
         .news-ticker .ticker-content span {
             color: #fff;
@@ -230,6 +231,7 @@
             padding: 0 30px;
             display: inline-block;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
         .news-ticker .ticker-content i {
             color: #ffc107;
@@ -257,10 +259,10 @@
 
         @keyframes ticker-scroll {
             0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
+            100% { transform: translateX(-33.33%); }
         }
 
-        /* ===== الأقسام الرئيسية (كروت مستطيلة) ===== */
+        /* ===== الأقسام الرئيسية ===== */
         .categories-section {
             padding: 20px 0;
         }
@@ -715,21 +717,12 @@
                 const docRef = doc(db, "settings", "ticker");
                 const docSnap = await getDoc(docRef);
                 
+                let messages = [];
                 if (docSnap.exists() && docSnap.data().messages && docSnap.data().messages.length > 0) {
-                    const messages = docSnap.data().messages;
-                    let html = '';
-                    // عرض كل رسالة مع أيقونة
-                    messages.forEach(msg => {
-                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
-                    });
-                    // تكرار الرسائل لتكون الحركة سلسة (لأن العرض يعتمد على التكرار)
-                    messages.forEach(msg => {
-                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
-                    });
-                    container.innerHTML = html;
+                    messages = docSnap.data().messages;
                 } else {
-                    // نصوص احتياطية في حال كانت قاعدة البيانات فارغة
-                    const fallbackMessages = [
+                    // نصوص احتياطية
+                    messages = [
                         "مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية",
                         "اشتر الآن واستمتع بخدماتنا المميزة",
                         "عروض حصرية على الألعاب والتطبيقات",
@@ -737,32 +730,35 @@
                         "منتجات جديدة تضاف يومياً",
                         "طرق دفع آمنة وسريعة"
                     ];
-                    let html = '';
-                    fallbackMessages.forEach(msg => {
-                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
-                    });
-                    fallbackMessages.forEach(msg => {
-                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
-                    });
-                    container.innerHTML = html;
                 }
+
+                // بناء HTML مع تكرار الرسائل 3 مرات لضمان استمرارية الحركة
+                let html = '';
+                for (let i = 0; i < 3; i++) {
+                    messages.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                }
+                container.innerHTML = html;
+
             } catch (e) {
                 console.error("خطأ في تحميل شريط الأخبار:", e);
-                // في حال حدوث خطأ، نعرض نصوص احتياطية
-                container.innerHTML = `
-                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store</span>
-                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا</span>
-                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
-                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب</span>
-                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
-                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
-                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store</span>
-                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا</span>
-                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
-                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب</span>
-                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
-                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
-                `;
+                // نصوص احتياطية في حال الخطأ
+                const fallback = [
+                    "مرحباً بكم في Yasser-Store",
+                    "اشتر الآن واستمتع بخدماتنا",
+                    "عروض حصرية على الألعاب والتطبيقات",
+                    "تواصل معنا عبر واتساب",
+                    "منتجات جديدة تضاف يومياً",
+                    "طرق دفع آمنة وسريعة"
+                ];
+                let html = '';
+                for (let i = 0; i < 3; i++) {
+                    fallback.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                }
+                container.innerHTML = html;
             }
         }
 
@@ -892,7 +888,7 @@
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
                 loadSlider();
-                loadTicker(); // تحميل شريط الأخبار
+                loadTicker();
 
             } else {
                 loginBtn.classList.remove('d-none');
@@ -901,7 +897,7 @@
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
                 loadSlider();
-                loadTicker(); // تحميل شريط الأخبار للمستخدمين غير المسجلين أيضاً
+                loadTicker();
             }
         });
 
