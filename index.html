@@ -207,6 +207,60 @@
             background: #7c4dff;
         }
 
+        /* ===== شريط الأخبار المتحرك ===== */
+        .news-ticker {
+            background: #1a0033;
+            border: 1px solid #4d0099;
+            border-radius: 15px;
+            padding: 10px 0;
+            margin: 10px 0 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(128, 0, 255, 0.2);
+        }
+        .news-ticker .ticker-content {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            animation: ticker-scroll 10s linear infinite;
+        }
+        .news-ticker .ticker-content span {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0 30px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        .news-ticker .ticker-content i {
+            color: #ffc107;
+            font-size: 1.2rem;
+            margin-left: 10px;
+        }
+        .news-ticker .ticker-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #7c4dff;
+            color: #fff;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            z-index: 5;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.5);
+        }
+        .news-ticker .ticker-icon i {
+            margin-left: 5px;
+            color: #fff;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
         /* ===== الأقسام الرئيسية (كروت مستطيلة) ===== */
         .categories-section {
             padding: 20px 0;
@@ -405,6 +459,8 @@
             .sidebar { width: 280px; right: -290px; }
             .slider-container img { height: 220px; }
             .sidebar-logo img { width: 60px; height: 60px; }
+            .news-ticker .ticker-content span { font-size: 0.9rem; padding: 0 15px; }
+            .news-ticker .ticker-icon { font-size: 0.7rem; padding: 3px 10px; right: 5px; }
         }
     </style>
 </head>
@@ -547,6 +603,26 @@
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- ===== شريط الأخبار المتحرك (جديد) ===== -->
+            <div class="news-ticker">
+                <div class="ticker-icon"><i class="bi bi-megaphone"></i> أخبار</div>
+                <div class="ticker-content">
+                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية</span>
+                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا المميزة</span>
+                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
+                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب للاستفسارات</span>
+                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
+                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
+                    <!-- كرر النص لتكرار الحركة -->
+                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية</span>
+                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا المميزة</span>
+                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
+                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب للاستفسارات</span>
+                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
+                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
                 </div>
             </div>
 
