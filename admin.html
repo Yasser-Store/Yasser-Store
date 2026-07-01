@@ -50,7 +50,16 @@
         .btn-back:hover { background: #6a00cc; }
         .category-badge { background: #4d0099; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem; color: #fff; }
         .status-select { min-width: 140px; background-color: #1f0040 !important; color: #fff !important; border: 1px solid #7b1fa2 !important; border-radius: 12px !important; padding: 6px 12px !important; }
-        textarea.form-control { min-height: 150px; }
+        .settings-textarea { background: #1a0033 !important; color: #fff !important; border: 1px solid #7b1fa2 !important; border-radius: 12px !important; padding: 12px !important; min-height: 150px; width: 100%; resize: vertical; }
+        .settings-textarea:focus { border-color: #b388ff !important; box-shadow: 0 0 0 0.2rem rgba(179,136,255,0.3) !important; }
+        .preview-box { background: #0d0d0d; border: 1px solid #4d0099; border-radius: 12px; padding: 15px; margin-top: 10px; overflow: hidden; }
+        .preview-box .ticker-preview { display: flex; white-space: nowrap; animation: ticker-scroll 20s linear infinite; }
+        .preview-box .ticker-preview span { color: #fff; padding: 0 20px; }
+        .preview-box .ticker-preview i { color: #ffc107; margin-left: 8px; }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
     </style>
 </head>
 <body>
@@ -154,11 +163,21 @@
             <!-- ===== قسم الإعدادات (شريط الأخبار) ===== -->
             <div id="settingsSection" class="d-none">
                 <div class="card">
-                    <div class="section-title"><i class="bi bi-newspaper"></i><h3>التحكم بشريط الأخبار</h3></div>
-                    <p class="text-muted">اكتب النصوص التي تريد ظهورها في شريط الأخبار المتحرك، كل جملة في سطر منفصل.</p>
-                    <textarea id="newsTextarea" class="form-control" rows="6" placeholder="أدخل جمل الأخبار هنا، كل جملة في سطر منفصل..."></textarea>
-                    <button id="saveNewsBtn" class="btn btn-primary w-100 mt-3"><i class="bi bi-save"></i> حفظ التغييرات</button>
-                    <div id="newsSaveStatus" class="mt-2 text-center"></div>
+                    <div class="section-title"><i class="bi bi-gear"></i><h3>إعدادات شريط الأخبار</h3></div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-text-paragraph"></i> نصوص الأخبار (كل سطر = رسالة)</label>
+                        <textarea id="tickerMessages" class="settings-textarea" placeholder="اكتب رسائل الأخبار هنا، كل رسالة في سطر منفصل..."></textarea>
+                        <small class="text-muted">أدخل كل رسالة في سطر جديد. سيتم عرضها في شريط الأخبار المتحرك في الصفحة الرئيسية.</small>
+                    </div>
+                    <button id="saveTickerBtn" class="btn btn-primary w-100 py-2"><i class="bi bi-save"></i> حفظ الإعدادات</button>
+                    <div class="mt-3">
+                        <label class="form-label"><i class="bi bi-eye"></i> معاينة الشريط</label>
+                        <div class="preview-box">
+                            <div class="ticker-preview" id="tickerPreview">
+                                <span><i class="bi bi-star-fill"></i> جاري تحميل المعاينة...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -201,10 +220,10 @@
 
             if (tab === 'orders') renderOrders();
             if (tab === 'users') renderUsers();
-            if (tab === 'settings') loadNewsSettings();
+            if (tab === 'settings') loadTickerSettings();
         };
 
-        // ---------- المنتجات (نفس الكود السابق) ----------
+        // ---------- المنتجات ----------
         async function renderProducts() {
             const tbody = document.getElementById('pTable');
             tbody.innerHTML = '';
@@ -434,37 +453,65 @@
             }
         };
 
-        // ---------- شريط الأخبار (الإعدادات) ----------
-        async function loadNewsSettings() {
+        // ---------- إعدادات شريط الأخبار ----------
+        async function loadTickerSettings() {
+            const textarea = document.getElementById('tickerMessages');
+            const preview = document.getElementById('tickerPreview');
             try {
-                const docRef = doc(db, "settings", "news");
+                const docRef = doc(db, "settings", "ticker");
                 const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const items = data.items || [];
-                    document.getElementById('newsTextarea').value = items.join('\n');
+                if (docSnap.exists() && docSnap.data().messages) {
+                    const messages = docSnap.data().messages;
+                    textarea.value = messages.join('\n');
+                    // تحديث المعاينة
+                    let previewHtml = '';
+                    messages.forEach(msg => {
+                        previewHtml += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    messages.forEach(msg => {
+                        previewHtml += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    preview.innerHTML = previewHtml || '<span>لا توجد رسائل</span>';
                 } else {
-                    document.getElementById('newsTextarea').value = '';
+                    textarea.value = '';
+                    preview.innerHTML = '<span>لا توجد رسائل محفوظة</span>';
                 }
             } catch (e) {
                 console.error("خطأ في تحميل الإعدادات:", e);
+                textarea.value = '';
+                preview.innerHTML = '<span>خطأ في التحميل</span>';
             }
         }
 
-        document.getElementById('saveNewsBtn').addEventListener('click', async () => {
-            const text = document.getElementById('newsTextarea').value;
-            const items = text.split('\n').filter(line => line.trim() !== '');
-            if (items.length === 0) {
-                document.getElementById('newsSaveStatus').innerHTML = '<span class="text-warning">⚠️ الرجاء إدخال نص واحد على الأقل.</span>';
-                return;
+        // حفظ الإعدادات
+        document.getElementById('saveTickerBtn').addEventListener('click', async () => {
+            const textarea = document.getElementById('tickerMessages');
+            const messages = textarea.value.split('\n').filter(msg => msg.trim() !== '');
+            if (messages.length === 0) {
+                if (!confirm('هل تريد حذف جميع رسائل الأخبار؟')) return;
             }
+            const btn = document.getElementById('saveTickerBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> جاري الحفظ...';
+
             try {
-                await setDoc(doc(db, "settings", "news"), { items: items });
-                document.getElementById('newsSaveStatus').innerHTML = '<span class="text-success">✅ تم حفظ النصوص بنجاح!</span>';
-                setTimeout(() => { document.getElementById('newsSaveStatus').innerHTML = ''; }, 3000);
+                await setDoc(doc(db, "settings", "ticker"), { messages });
+                alert('✅ تم حفظ الإعدادات بنجاح!');
+                // تحديث المعاينة
+                const preview = document.getElementById('tickerPreview');
+                let previewHtml = '';
+                messages.forEach(msg => {
+                    previewHtml += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                });
+                messages.forEach(msg => {
+                    previewHtml += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                });
+                preview.innerHTML = previewHtml || '<span>لا توجد رسائل</span>';
             } catch (e) {
-                document.getElementById('newsSaveStatus').innerHTML = `<span class="text-danger">❌ خطأ: ${e.message}</span>`;
+                alert('❌ حدث خطأ أثناء الحفظ: ' + e.message);
             }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-save"></i> حفظ الإعدادات';
         });
 
         // ---------- التحقق من الأدمن ----------
