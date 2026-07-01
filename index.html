@@ -222,7 +222,7 @@
             display: flex;
             align-items: center;
             white-space: nowrap;
-            animation: ticker-scroll 10s linear infinite;
+            animation: ticker-scroll 25s linear infinite;
         }
         .news-ticker .ticker-content span {
             color: #fff;
@@ -606,23 +606,12 @@
                 </div>
             </div>
 
-            <!-- ===== شريط الأخبار المتحرك (جديد) ===== -->
+            <!-- ===== شريط الأخبار المتحرك (ديناميكي من Firebase) ===== -->
             <div class="news-ticker">
                 <div class="ticker-icon"><i class="bi bi-megaphone"></i> أخبار</div>
-                <div class="ticker-content">
-                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية</span>
-                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا المميزة</span>
-                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
-                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب للاستفسارات</span>
-                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
-                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
-                    <!-- كرر النص لتكرار الحركة -->
-                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية</span>
-                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا المميزة</span>
-                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
-                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب للاستفسارات</span>
-                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
-                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
+                <div class="ticker-content" id="tickerContent">
+                    <!-- سيتم ملؤه بواسطة JavaScript -->
+                    <span><i class="bi bi-star-fill"></i> جاري تحميل الأخبار...</span>
                 </div>
             </div>
 
@@ -719,6 +708,64 @@
             await signOut(auth);
             location.reload();
         });
+
+        // ===== دالة تحميل شريط الأخبار من Firebase =====
+        async function loadTicker() {
+            const container = document.getElementById('tickerContent');
+            try {
+                const docRef = doc(db, "settings", "ticker");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists() && docSnap.data().messages && docSnap.data().messages.length > 0) {
+                    const messages = docSnap.data().messages;
+                    let html = '';
+                    // عرض كل رسالة مع أيقونة
+                    messages.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    // تكرار الرسائل لتكون الحركة سلسة (لأن العرض يعتمد على التكرار)
+                    messages.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    // نصوص احتياطية في حال كانت قاعدة البيانات فارغة
+                    const fallbackMessages = [
+                        "مرحباً بكم في Yasser-Store .. أحدث العروض والمنتجات بأسعار تنافسية",
+                        "اشتر الآن واستمتع بخدماتنا المميزة",
+                        "عروض حصرية على الألعاب والتطبيقات",
+                        "تواصل معنا عبر واتساب للاستفسارات",
+                        "منتجات جديدة تضاف يومياً",
+                        "طرق دفع آمنة وسريعة"
+                    ];
+                    let html = '';
+                    fallbackMessages.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    fallbackMessages.forEach(msg => {
+                        html += `<span><i class="bi bi-star-fill"></i> ${msg}</span>`;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("خطأ في تحميل شريط الأخبار:", e);
+                // في حال حدوث خطأ، نعرض نصوص احتياطية
+                container.innerHTML = `
+                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store</span>
+                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا</span>
+                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
+                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب</span>
+                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
+                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
+                    <span><i class="bi bi-star-fill"></i> مرحباً بكم في Yasser-Store</span>
+                    <span><i class="bi bi-star-fill"></i> اشتر الآن واستمتع بخدماتنا</span>
+                    <span><i class="bi bi-star-fill"></i> عروض حصرية على الألعاب والتطبيقات</span>
+                    <span><i class="bi bi-star-fill"></i> تواصل معنا عبر واتساب</span>
+                    <span><i class="bi bi-star-fill"></i> منتجات جديدة تضاف يومياً</span>
+                    <span><i class="bi bi-star-fill"></i> طرق دفع آمنة وسريعة</span>
+                `;
+            }
+        }
 
         // ===== السلايدر =====
         async function loadSlider() {
@@ -846,6 +893,7 @@
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
                 loadSlider();
+                loadTicker(); // تحميل شريط الأخبار
 
             } else {
                 loginBtn.classList.remove('d-none');
@@ -854,12 +902,16 @@
                 banMessage.classList.add('d-none');
                 mainContent.classList.remove('d-none');
                 loadSlider();
+                loadTicker(); // تحميل شريط الأخبار للمستخدمين غير المسجلين أيضاً
             }
         });
 
         // تحميل أولي
         setTimeout(() => {
-            if (!auth.currentUser) loadSlider();
+            if (!auth.currentUser) {
+                loadSlider();
+                loadTicker();
+            }
         }, 1000);
     </script>
 </body>
